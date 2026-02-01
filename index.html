@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visual Vocab Master</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div id="app-container">
+        <!-- Sidebar -->
+        <aside>
+            <div class="flex items-center gap-3 mb-10 px-2 cursor-pointer" onclick="app.toggleSettings()">
+                <div
+                    class="w-10 h-10 bg-gradient-to-tr from-purple-500 to-pink-500 rounded-xl flex items-center justify-center text-white shadow-lg animate-pulse">
+                    <i class="fa-solid fa-robot"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-xl text-slate-800 leading-none">Vocab<span
+                            class="text-purple-500">AI</span></h1>
+                    <p class="text-xs text-slate-400 mt-1">Powered by Gemini</p>
+                </div>
+            </div>
+
+            <nav class="flex-1">
+                <div class="nav-item active" onclick="app.navigate('learn')">
+                    <i class="fa-solid fa-pen-to-square w-6"></i>
+                    <span>Từ vựng cần học</span>
+                </div>
+                <div class="nav-item" onclick="app.navigate('review')">
+                    <i class="fa-solid fa-box-archive w-6"></i>
+                    <span>Kho lưu trữ</span>
+                </div>
+                <div class="nav-item" onclick="app.navigate('games')">
+                    <i class="fa-solid fa-gamepad w-6"></i>
+                    <span>Trò chơi ôn tập</span>
+                </div>
+                <div class="nav-item" onclick="app.navigate('stats')">
+                    <i class="fa-solid fa-chart-pie w-6"></i>
+                    <span>Kết quả & Chỉ số</span>
+                </div>
+            </nav>
+
+            <div class="border-t pt-4">
+                <div class="flex items-center gap-3 px-2">
+                    <div class="w-8 h-8 rounded-full bg-slate-200"></div>
+                    <div>
+                        <p class="text-sm font-medium text-slate-700">Người dùng</p>
+                        <p class="text-xs text-slate-400">Học viên</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main>
+
+            <!-- SECTION 1: LEARN (INPUT) -->
+            <section id="view-learn" class="active">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-800">Nhập từ vựng mới</h2>
+                        <p class="text-slate-500">Nhập từ tiếng Anh, hệ thống sẽ tự động điền thông tin còn lại.</p>
+                    </div>
+                    <button onclick="app.saveSession()"
+                        class="bg-sky-500 hover:bg-sky-600 text-white px-6 py-2.5 rounded-xl shadow-lg shadow-sky-200 font-medium transition-transform active:scale-95 flex items-center gap-2">
+                        <i class="fa-solid fa-save"></i> Lưu bộ từ này
+                    </button>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                    <table class="vocab-table">
+                        <thead>
+                            <tr>
+                                <th class="w-1/6">Từ vựng (Word)</th>
+                                <th class="w-1/6">Phát âm (IPA)</th>
+                                <th class="w-1/6">Loại từ</th>
+                                <th class="w-1/4">Nghĩa tiếng Việt</th>
+                                <th class="w-1/4">Ví dụ câu</th>
+                                <th class="w-10"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="input-rows">
+                            <!-- Rows injected by JS -->
+                        </tbody>
+                    </table>
+                    <div class="p-4 border-t bg-slate-50/50 text-center">
+                        <button onclick="app.addRow()"
+                            class="text-sky-600 hover:text-sky-700 text-sm font-medium px-4 py-2 hover:bg-white rounded-lg transition-colors border border-transparent hover:border-slate-200">
+                            <i class="fa-solid fa-plus mr-1"></i> Thêm hàng mới
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 2: REVIEW (LIST) -->
+            <section id="view-review">
+                <h2 class="text-2xl font-bold text-slate-800 mb-6">Kho từ vựng đã lưu</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="sets-grid">
+                    <!-- Sets injected by JS -->
+                </div>
+            </section>
+
+            <!-- SECTION 2.1: REVIEW DETAIL (HIDDEN) -->
+            <section id="view-set-detail" class="hidden">
+                <div class="flex items-center gap-4 mb-6">
+                    <button onclick="app.navigate('review')"
+                        class="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:text-sky-600 hover:border-sky-200 transition-colors shadow-sm">
+                        <i class="fa-solid fa-arrow-left"></i>
+                    </button>
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-800" id="detail-title">Chi tiết bộ từ</h2>
+                        <p class="text-slate-500" id="detail-time">Time</p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                    <table class="vocab-table">
+                        <thead>
+                            <tr>
+                                <th class="w-1/6">Từ vựng (Word)</th>
+                                <th class="w-1/6">Phát âm (IPA)</th>
+                                <th class="w-1/6">Loại từ</th>
+                                <th class="w-1/4">Nghĩa tiếng Việt</th>
+                                <th class="w-1/4">Ví dụ câu</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detail-rows">
+                            <!-- Detail rows injected by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- SECTION 3: GAMES (DASHBOARD) -->
+            <section id="view-games">
+                <!-- 3.0: GAME DASHBOARD (Menu) -->
+                <div id="game-dashboard">
+                    <h2 class="text-2xl font-bold text-slate-800 mb-2">Trung tâm Trò chơi</h2>
+                    <p class="text-slate-500 mb-8">Chọn một trò chơi để bắt đầu ôn tập các từ đã lưu.</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <!-- Game Card 1 -->
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow cursor-pointer group"
+                            onclick="app.prepareGame('flashcard')">
+                            <div
+                                class="w-14 h-14 bg-orange-100 rounded-2xl flex items-center justify-center text-orange-500 text-2xl mb-4 group-hover:scale-110 transition-transform">
+                                <i class="fa-solid fa-layer-group"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-slate-800 mb-1">Flashcards</h3>
+                            <p class="text-sm text-slate-500">Lật thẻ để ôn lại nghĩa và phát âm.</p>
+                        </div>
+
+                        <!-- Game Card 2 (Coming Soon) -->
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow cursor-pointer group"
+                            onclick="app.prepareGame('quiz')">
+                            <div
+                                class="w-14 h-14 bg-indigo-100 rounded-2xl flex items-center justify-center text-indigo-500 text-2xl mb-4 group-hover:scale-110 transition-transform">
+                                <i class="fa-solid fa-circle-question"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-slate-800 mb-1">Trắc nghiệm</h3>
+                            <p class="text-sm text-slate-500">Chọn đáp án đúng để ghi điểm.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3.1: GAME SETUP (Pick Set) -->
+                <div id="game-setup" class="hidden">
+                    <div class="flex items-center gap-4 mb-6">
+                        <button onclick="app.showGameDashboard()"
+                            class="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:text-sky-600 hover:border-sky-200 transition-colors shadow-sm">
+                            <i class="fa-solid fa-arrow-left"></i>
+                        </button>
+                        <h2 class="text-2xl font-bold text-slate-800">Chọn bộ từ để ôn tập</h2>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="game-set-list">
+                        <!-- Injected by JS -->
+                    </div>
+                </div>
+
+                <!-- 3.2: FLASHCARD GAME UI -->
+                <div id="game-flashcard" class="hidden h-[600px] flex flex-col">
+                    <!-- Header -->
+                    <div class="flex justify-between items-center mb-6">
+                        <button onclick="app.showGameDashboard()"
+                            class="text-slate-400 hover:text-orange-500 flex items-center gap-2">
+                            <i class="fa-solid fa-xmark"></i> Thoát
+                        </button>
+                        <div class="text-slate-500 font-medium">
+                            <span id="fc-current">1</span> / <span id="fc-total">10</span>
+                        </div>
+                    </div>
+
+                    <!-- Card Area -->
+                    <div class="flex-1 perspective-1000 flex justify-center items-center">
+                        <div id="flashcard"
+                            class="relative w-full max-w-lg h-80 bg-white rounded-3xl shadow-xl border border-slate-100 cursor-pointer transform-style-3d transition-transform duration-500 group"
+                            onclick="app.flipCard()">
+
+                            <!-- FRONT -->
+                            <div
+                                class="absolute inset-0 backface-hidden flex flex-col items-center justify-center p-8 bg-white rounded-3xl">
+                                <span class="text-sm text-slate-400 font-medium uppercase tracking-wider mb-4">Tiếng
+                                    Anh</span>
+                                <h3 class="text-4xl font-bold text-slate-800 text-center" id="fc-front-word">Word</h3>
+                            </div>
+
+                            <!-- BACK -->
+                            <div
+                                class="absolute inset-0 backface-hidden rotate-y-180 flex flex-col items-center justify-center p-8 bg-gradient-to-br from-orange-50 to-white rounded-3xl border-2 border-orange-100 overflow-y-auto">
+                                <div class="text-center">
+                                    <h3 class="text-2xl font-bold text-orange-600 mb-1" id="fc-back-word">Word</h3>
+                                    <p class="text-slate-400 font-mono mb-4" id="fc-back-ipa">/ipa/</p>
+
+                                    <div
+                                        class="bg-white px-4 py-2 rounded-lg border border-orange-100 shadow-sm inline-block mb-4">
+                                        <p class="text-lg text-slate-800 font-medium" id="fc-back-mean">Nghĩa tiếng Việt
+                                        </p>
+                                    </div>
+
+                                    <p class="text-slate-500 italic text-sm px-4" id="fc-back-ex">"Example sentence goes
+                                        here."</p>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- Controls -->
+                    <div class="flex justify-center items-center gap-8 mt-8 pb-8">
+                        <button onclick="app.prevCard()"
+                            class="w-14 h-14 rounded-full bg-white border border-slate-200 text-slate-400 hover:text-orange-500 hover:border-orange-200 shadow-sm transition-all active:scale-95">
+                            <i class="fa-solid fa-arrow-left text-xl"></i>
+                        </button>
+
+                        <div class="text-center">
+                            <p class="text-xs text-slate-400 mb-1">Chạm vào thẻ để lật</p>
+                            <button onclick="app.flipCard()"
+                                class="px-6 py-2 bg-orange-500 text-white rounded-full font-medium shadow-lg shadow-orange-200 hover:bg-orange-600 transition-transform active:scale-95">
+                                <i class="fa-solid fa-rotate mr-2"></i> Lật thẻ
+                            </button>
+                        </div>
+
+                        <button onclick="app.nextCard()"
+                            class="w-14 h-14 rounded-full bg-white border border-slate-200 text-slate-400 hover:text-orange-500 hover:border-orange-200 shadow-sm transition-all active:scale-95">
+                            <i class="fa-solid fa-arrow-right text-xl"></i>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- 3.3: QUIZ GAME UI -->
+            <div id="game-quiz" class="hidden h-[600px] flex flex-col">
+                <!-- Header -->
+                <div class="flex justify-between items-center mb-6">
+                    <button onclick="app.showGameDashboard()"
+                        class="text-slate-400 hover:text-indigo-500 flex items-center gap-2">
+                        <i class="fa-solid fa-xmark"></i> Thoát
+                    </button>
+                    <div class="flex items-center gap-4">
+                        <div class="text-indigo-600 font-bold bg-indigo-50 px-3 py-1 rounded-lg">
+                            Điểm: <span id="quiz-score">0</span>
+                        </div>
+                        <div class="text-slate-500 font-medium">
+                            <span id="quiz-current">1</span> / <span id="quiz-total">10</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Question Area -->
+                <div class="flex-1 flex flex-col items-center justify-center max-w-2xl mx-auto w-full">
+                    <div
+                        class="w-full bg-white p-8 rounded-3xl shadow-lg border border-indigo-100 text-center mb-8 relative overflow-hidden">
+                        <p class="text-slate-400 text-sm uppercase tracking-wider font-bold mb-2">Chọn nghĩa của từ:</p>
+                        <h3 class="text-4xl font-bold text-slate-800 mb-4" id="quiz-question">Question</h3>
+                    </div>
+
+                    <!-- Answers Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full" id="quiz-answers">
+                        <!-- Buttons injected by JS -->
+                    </div>
+
+                    <div id="quiz-feedback"
+                        class="mt-8 h-8 text-center font-bold text-lg transition-opacity duration-300 opacity-0">
+                        Feedback goes here...
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 4: STATS -->
+            <section id="view-stats">
+                <h2 class="text-2xl font-bold text-slate-800 mb-6">Kết quả học tập</h2>
+                <div class="bg-white rounded-2xl p-8 text-center text-slate-400">
+                    <i class="fa-solid fa-chart-simple text-4xl mb-3"></i>
+                    <p>Chức năng đang phát triển...</p>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- API KEY MODAL -->
+    <div id="settings-modal"
+        class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center animate-fade-in">
+        <div class="bg-white w-full max-w-md p-6 rounded-2xl shadow-2xl transform transition-all scale-100">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-slate-800">Cấu hình AI</h3>
+                <button onclick="app.toggleSettings()" class="text-slate-400 hover:text-red-500">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-slate-700 mb-2">Gemini API Key</label>
+                <input type="password" id="api-key-input"
+                    class="w-full p-3 border border-slate-200 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all font-mono text-sm"
+                    placeholder="Paste your key here (AIzaSy...)">
+                <p class="text-xs text-slate-500 mt-2">
+                    Chưa có key? <a href="https://aistudio.google.com/app/apikey" target="_blank"
+                        class="text-purple-600 hover:underline">Lấy miễn phí tại đây</a>.
+                </p>
+            </div>
+
+            <button onclick="app.saveApiKey()"
+                class="w-full bg-gradient-to-r from-purple-500 to-pink-600 text-white font-bold py-3 rounded-xl shadow-lg shadow-purple-200 hover:opacity-90 transition-transform active:scale-95">
+                Lưu cấu hình
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN APP SCRIPT -->
+    <script src="script.js?v=2"></script>
+</body>
+
+</html>

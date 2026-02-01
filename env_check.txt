@@ -1,0 +1,15 @@
+GIT: 
+'git' is not recognized as an internal or external command,
+operable program or batch file.
+NODE: 
+'node' is not recognized as an internal or external command,
+operable program or batch file.
+GH: 
+'gh' is not recognized as an internal or external command,
+operable program or batch file.
+VERCEL: 
+'vercel' is not recognized as an internal or external command,
+operable program or batch file.
+NETLIFY: 
+'netlify' is not recognized as an internal or external command,
+operable program or batch file.
