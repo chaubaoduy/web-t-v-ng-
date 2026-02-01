@@ -548,6 +548,7 @@ class App {
 
         this.gameState = {
             type: gameType,
+            setId: setId, // Store ID for results
             words: set.words,
             currentIndex: 0,
             score: 0,
@@ -703,12 +704,7 @@ class App {
                 this.renderQuiz();
             } else {
                 alert(`Kết thúc! Bạn đạt ${this.gameState.score} điểm.`);
-                this.saveGameResult('quiz', this.gameState.words[0].id || 'unknown', `${this.gameState.score} điểm`);
-                // Note: words doesn't store setID directly in memory, we need to pass it or store in state
-                // Fix: LaunchGame stores set.id in logic? No...
-                // Let's check LaunchGame.
-                // launchGame(gameType, setId) { ... 
-                // We should store setId in gameState!
+                this.saveGameResult('quiz', this.gameState.setId, `${this.gameState.score} điểm`);
                 this.showGameDashboard();
             }
         }, 1500);
@@ -812,7 +808,7 @@ class App {
 
                     if (state.matchedPairs === state.totalPairs) {
                         alert("Xuất sắc! Bạn đã ghép đúng tất cả.");
-                        this.saveGameResult('memory', this.gameState.setId || 'unknown', 'Hoàn thành');
+                        this.saveGameResult('memory', this.gameState.setId, 'Hoàn thành');
                         this.showGameDashboard();
                     }
                 }, 800);
@@ -902,7 +898,7 @@ class App {
                 this.renderSentenceGame();
             } else {
                 alert('Bạn đã hoàn thành bài tập điền từ!');
-                this.saveGameResult('sentence', this.gameState.setId || 'unknown', 'Hoàn thành');
+                this.saveGameResult('sentence', this.gameState.setId, 'Hoàn thành');
                 this.showGameDashboard();
             }
         }, 1500);
@@ -996,7 +992,7 @@ class App {
                     this.renderScrambleGame();
                 } else {
                     alert('Chúc mừng! Bạn đã hoàn thành trò chơi sắp xếp từ.');
-                    this.saveGameResult('scramble', this.gameState.setId || 'unknown', 'Hoàn thành');
+                    this.saveGameResult('scramble', this.gameState.setId, 'Hoàn thành');
                     this.showGameDashboard();
                 }
             }, 1000);
