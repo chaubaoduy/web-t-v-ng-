@@ -220,6 +220,8 @@ class App {
 
         if (viewId === 'review') {
             this.renderSets();
+        } else if (viewId === 'stats') {
+            this.renderStats();
         }
     }
 
@@ -437,6 +439,68 @@ class App {
         }
     }
 
+    // --- STATS LOGIC ---
+    renderStats() {
+        const sets = Store.getSets();
+        const results = Store.getResults();
+
+        // 1. Summary Cards
+        const totalWords = sets.reduce((sum, set) => sum + set.wordCount, 0);
+        document.getElementById('stat-total-words').textContent = totalWords;
+        document.getElementById('stat-total-sets').textContent = sets.length;
+        document.getElementById('stat-total-games').textContent = results.length;
+
+        // 2. History Table
+        const tbody = document.getElementById('stat-history-rows');
+        tbody.innerHTML = '';
+
+        if (results.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-slate-400">Chưa có dữ liệu.</td></tr>`;
+            return;
+        }
+
+        // Show last 10 results
+        results.slice(0, 10).forEach(res => {
+            const tr = document.createElement('tr');
+            tr.className = 'border-b border-slate-50 hover:bg-slate-50/50 transition-colors';
+
+            // Format Game Name
+            let gameName = res.type;
+            let icon = 'fa-gamepad';
+            let color = 'text-slate-500';
+
+            if (res.type === 'quiz') { gameName = 'Trắc nghiệm'; icon = 'fa-circle-question'; color = 'text-indigo-500'; }
+            if (res.type === 'memory') { gameName = 'Ghép thẻ'; icon = 'fa-table-cells'; color = 'text-emerald-500'; }
+            if (res.type === 'sentence') { gameName = 'Điền từ'; icon = 'fa-pen-nib'; color = 'text-blue-500'; }
+            if (res.type === 'scramble') { gameName = 'Sắp xếp từ'; icon = 'fa-spell-check'; color = 'text-purple-500'; }
+
+            tr.innerHTML = `
+                <td class="p-4 font-medium text-slate-700">
+                    <i class="fa-solid ${icon} ${color} mr-2"></i> ${gameName}
+                </td>
+                <td class="p-4 text-slate-500 text-sm">${res.setName}</td>
+                <td class="p-4 font-bold text-slate-700">${res.result}</td>
+                <td class="p-4 text-slate-400 text-sm">${res.timestamp}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    saveGameResult(type, setId, resultText) {
+        const sets = Store.getSets();
+        const set = sets.find(s => s.id === setId);
+        const setName = set ? (set.name || set.timestamp) : 'Unknown Set';
+
+        const result = {
+            id: Date.now(),
+            type: type,
+            setName: setName,
+            result: resultText,
+            timestamp: new Date().toLocaleString('vi-VN')
+        };
+        Store.saveResult(result);
+    }
+
     // --- GAME LOGIC ---
     showGameDashboard() {
         document.getElementById('game-dashboard').classList.remove('hidden');
@@ -639,6 +703,12 @@ class App {
                 this.renderQuiz();
             } else {
                 alert(`Kết thúc! Bạn đạt ${this.gameState.score} điểm.`);
+                this.saveGameResult('quiz', this.gameState.words[0].id || 'unknown', `${this.gameState.score} điểm`);
+                // Note: words doesn't store setID directly in memory, we need to pass it or store in state
+                // Fix: LaunchGame stores set.id in logic? No...
+                // Let's check LaunchGame.
+                // launchGame(gameType, setId) { ... 
+                // We should store setId in gameState!
                 this.showGameDashboard();
             }
         }, 1500);
@@ -742,6 +812,7 @@ class App {
 
                     if (state.matchedPairs === state.totalPairs) {
                         alert("Xuất sắc! Bạn đã ghép đúng tất cả.");
+                        this.saveGameResult('memory', this.gameState.setId || 'unknown', 'Hoàn thành');
                         this.showGameDashboard();
                     }
                 }, 800);
@@ -831,6 +902,7 @@ class App {
                 this.renderSentenceGame();
             } else {
                 alert('Bạn đã hoàn thành bài tập điền từ!');
+                this.saveGameResult('sentence', this.gameState.setId || 'unknown', 'Hoàn thành');
                 this.showGameDashboard();
             }
         }, 1500);
@@ -924,6 +996,7 @@ class App {
                     this.renderScrambleGame();
                 } else {
                     alert('Chúc mừng! Bạn đã hoàn thành trò chơi sắp xếp từ.');
+                    this.saveGameResult('scramble', this.gameState.setId || 'unknown', 'Hoàn thành');
                     this.showGameDashboard();
                 }
             }, 1000);

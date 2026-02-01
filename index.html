@@ -412,9 +412,60 @@
             <!-- SECTION 4: STATS -->
             <section id="view-stats">
                 <h2 class="text-2xl font-bold text-slate-800 mb-6">Kết quả học tập</h2>
-                <div class="bg-white rounded-2xl p-8 text-center text-slate-400">
-                    <i class="fa-solid fa-chart-simple text-4xl mb-3"></i>
-                    <p>Chức năng đang phát triển...</p>
+
+                <!-- Summary Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4">
+                        <div
+                            class="w-12 h-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-book"></i>
+                        </div>
+                        <div>
+                            <p class="text-slate-400 text-sm font-medium">Tổng từ vựng</p>
+                            <h3 class="text-2xl font-bold text-slate-800" id="stat-total-words">0</h3>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4">
+                        <div
+                            class="w-12 h-12 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-layer-group"></i>
+                        </div>
+                        <div>
+                            <p class="text-slate-400 text-sm font-medium">Bộ từ vựng</p>
+                            <h3 class="text-2xl font-bold text-slate-800" id="stat-total-sets">0</h3>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4">
+                        <div
+                            class="w-12 h-12 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-gamepad"></i>
+                        </div>
+                        <div>
+                            <p class="text-slate-400 text-sm font-medium">Đã ôn tập</p>
+                            <h3 class="text-2xl font-bold text-slate-800" id="stat-total-games">0</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                    <div class="p-6 border-b border-slate-50">
+                        <h3 class="font-bold text-slate-800">Hoạt động gần đây</h3>
+                    </div>
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr
+                                class="text-slate-400 text-xs uppercase tracking-wider bg-slate-50/50 border-b border-slate-100">
+                                <th class="p-4 font-semibold">Trò chơi</th>
+                                <th class="p-4 font-semibold">Bộ từ</th>
+                                <th class="p-4 font-semibold">Kết quả</th>
+                                <th class="p-4 font-semibold">Thời gian</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stat-history-rows">
+                            <!-- Injected by JS -->
+                        </tbody>
+                    </table>
                 </div>
             </section>
 
