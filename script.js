@@ -517,7 +517,7 @@ class App {
 
             document.getElementById('fc-back-word').textContent = word.word;
             document.getElementById('fc-back-ipa').textContent = word.ipa;
-            document.getElementById('fc-back-mean').textContent = word.meaning;
+            document.getElementById('fc-back-type').textContent = word.type || '';
             document.getElementById('fc-back-mean').textContent = word.meaning;
             document.getElementById('fc-back-ex').textContent = word.example || '';
         }, 150);
