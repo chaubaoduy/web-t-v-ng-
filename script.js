@@ -485,300 +485,298 @@ class App {
             `;
                 tbody.appendChild(tr);
             });
+        } catch (e) {
+            console.error(e);
+            alert('Lỗi hiển thị thống kê: ' + e.message);
+        }
+    }
+
+    saveGameResult(type, setId, resultText) {
+        const sets = Store.getSets();
+        const set = sets.find(s => s.id === setId);
+        const setName = set ? (set.name || set.timestamp) : 'Unknown Set';
+
+        const result = {
+            id: Date.now(),
+            type: type,
+            setName: setName,
+            result: resultText,
+            timestamp: new Date().toLocaleString('vi-VN')
+        };
+        Store.saveResult(result);
+    }
+
+    // --- GAME LOGIC ---
+    showGameDashboard() {
+        document.getElementById('game-dashboard').classList.remove('hidden');
+        document.getElementById('game-setup').classList.add('hidden');
+        document.getElementById('game-flashcard').classList.add('hidden');
+        document.getElementById('game-quiz').classList.add('hidden');
+        document.getElementById('game-memory').classList.add('hidden');
+        document.getElementById('game-sentence').classList.add('hidden');
+        document.getElementById('game-scramble').classList.add('hidden');
+    }
+
+    prepareGame(gameType) {
+        // 1. Show Set Selection
+        const sets = Store.getSets();
+        if (sets.length === 0) {
+            alert('Bạn chưa có bộ từ vựng nào! Hãy vào phần "Học từ" để tạo trước nhé.');
+            return;
         }
 
-        } catch(e) {
-        console.error(e);
-        alert('Lỗi hiển thị thống kê: ' + e.message);
-    }
-}
+        document.getElementById('game-dashboard').classList.add('hidden');
+        document.getElementById('game-setup').classList.remove('hidden');
 
-saveGameResult(type, setId, resultText) {
-    const sets = Store.getSets();
-    const set = sets.find(s => s.id === setId);
-    const setName = set ? (set.name || set.timestamp) : 'Unknown Set';
+        const list = document.getElementById('game-set-list');
+        list.innerHTML = '';
 
-    const result = {
-        id: Date.now(),
-        type: type,
-        setName: setName,
-        result: resultText,
-        timestamp: new Date().toLocaleString('vi-VN')
-    };
-    Store.saveResult(result);
-}
-
-// --- GAME LOGIC ---
-showGameDashboard() {
-    document.getElementById('game-dashboard').classList.remove('hidden');
-    document.getElementById('game-setup').classList.add('hidden');
-    document.getElementById('game-flashcard').classList.add('hidden');
-    document.getElementById('game-quiz').classList.add('hidden');
-    document.getElementById('game-memory').classList.add('hidden');
-    document.getElementById('game-sentence').classList.add('hidden');
-    document.getElementById('game-scramble').classList.add('hidden');
-}
-
-prepareGame(gameType) {
-    // 1. Show Set Selection
-    const sets = Store.getSets();
-    if (sets.length === 0) {
-        alert('Bạn chưa có bộ từ vựng nào! Hãy vào phần "Học từ" để tạo trước nhé.');
-        return;
-    }
-
-    document.getElementById('game-dashboard').classList.add('hidden');
-    document.getElementById('game-setup').classList.remove('hidden');
-
-    const list = document.getElementById('game-set-list');
-    list.innerHTML = '';
-
-    sets.forEach(set => {
-        const btn = document.createElement('div');
-        btn.className = 'bg-white p-4 rounded-xl border border-slate-200 hover:border-sky-500 hover:bg-sky-50 cursor-pointer transition-all flex justify-between items-center group';
-        btn.onclick = () => this.launchGame(gameType, set.id);
-        btn.innerHTML = `
+        sets.forEach(set => {
+            const btn = document.createElement('div');
+            btn.className = 'bg-white p-4 rounded-xl border border-slate-200 hover:border-sky-500 hover:bg-sky-50 cursor-pointer transition-all flex justify-between items-center group';
+            btn.onclick = () => this.launchGame(gameType, set.id);
+            btn.innerHTML = `
                 <div>
                     <h4 class="font-bold text-slate-700">${set.timestamp}</h4>
                     <p class="text-sm text-slate-400">${set.wordCount} từ</p>
                 </div>
                 <i class="fa-solid fa-play text-slate-300 group-hover:text-sky-500 text-xl"></i>
             `;
-        list.appendChild(btn);
-    });
-}
-
-launchGame(gameType, setId) {
-    const sets = Store.getSets();
-    const set = sets.find(s => s.id === setId);
-    if (!set) return;
-
-    this.gameState = {
-        type: gameType,
-        setId: setId, // Store ID for results
-        words: set.words,
-        currentIndex: 0,
-        score: 0,
-        // Game specific state
-        flippedCards: [],
-        matchedPairs: 0
-    };
-
-    document.getElementById('game-setup').classList.add('hidden');
-
-    if (gameType === 'flashcard') {
-        document.getElementById('game-flashcard').classList.remove('hidden');
-        this.renderFlashcard();
-    } else if (gameType === 'quiz') {
-        document.getElementById('game-quiz').classList.remove('hidden');
-        this.renderQuiz();
-    } else if (gameType === 'memory') {
-        document.getElementById('game-memory').classList.remove('hidden');
-        this.renderMemoryGame();
-    } else if (gameType === 'sentence') {
-        document.getElementById('game-sentence').classList.remove('hidden');
-        this.renderSentenceGame();
-    } else if (gameType === 'scramble') {
-        document.getElementById('game-scramble').classList.remove('hidden');
-        this.renderScrambleGame();
+            list.appendChild(btn);
+        });
     }
-}
 
-// FLASHCARD SPECIFIC
-renderFlashcard() {
-    const state = this.gameState;
-    const word = state.words[state.currentIndex];
+    launchGame(gameType, setId) {
+        const sets = Store.getSets();
+        const set = sets.find(s => s.id === setId);
+        if (!set) return;
 
-    // Reset Flip
-    const card = document.getElementById('flashcard');
-    card.classList.remove('rotate-y-180');
-    state.isFlipped = false;
+        this.gameState = {
+            type: gameType,
+            setId: setId, // Store ID for results
+            words: set.words,
+            currentIndex: 0,
+            score: 0,
+            // Game specific state
+            flippedCards: [],
+            matchedPairs: 0
+        };
 
-    // Update UI Text
-    setTimeout(() => { // Update text after flip reset starts to avoid spoiler (if going back)
-        document.getElementById('fc-current').textContent = state.currentIndex + 1;
-        document.getElementById('fc-total').textContent = state.words.length;
+        document.getElementById('game-setup').classList.add('hidden');
 
-        document.getElementById('fc-front-word').textContent = word.word;
-
-        document.getElementById('fc-back-word').textContent = word.word;
-        document.getElementById('fc-back-ipa').textContent = word.ipa;
-        document.getElementById('fc-back-type').textContent = word.type || '';
-        document.getElementById('fc-back-mean').textContent = word.meaning;
-        document.getElementById('fc-back-ex').textContent = word.example || '';
-    }, 150);
-}
-
-flipCard() {
-    const card = document.getElementById('flashcard');
-    this.gameState.isFlipped = !this.gameState.isFlipped;
-
-    if (this.gameState.isFlipped) {
-        card.classList.add('rotate-y-180');
-    } else {
-        card.classList.remove('rotate-y-180');
-    }
-}
-
-nextCard() {
-    if (this.gameState.currentIndex < this.gameState.words.length - 1) {
-        this.gameState.currentIndex++;
-        this.renderFlashcard();
-    } else {
-        alert('Đã hết bộ từ! Chúc mừng bạn đã hoàn thành ôn tập.');
-        this.showGameDashboard();
-    }
-}
-
-prevCard() {
-    if (this.gameState.currentIndex > 0) {
-        this.gameState.currentIndex--;
-        this.renderFlashcard();
-    }
-}
-
-// QUIZ SPECIFIC
-renderQuiz() {
-    const state = this.gameState;
-    const word = state.words[state.currentIndex];
-
-    // Reset Feedback
-    const fb = document.getElementById('quiz-feedback');
-    fb.classList.add('opacity-0');
-    fb.textContent = '';
-
-    document.getElementById('quiz-score').textContent = state.score;
-    document.getElementById('quiz-current').textContent = state.currentIndex + 1;
-    document.getElementById('quiz-total').textContent = state.words.length;
-    document.getElementById('quiz-question').textContent = word.word;
-
-    // Generate Answers
-    const answers = [word];
-    const allWords = state.words;
-
-    // Pick 3 unique distractors
-    let attempts = 0;
-    while (answers.length < 4 && attempts < 50) {
-        const randomWord = allWords[Math.floor(Math.random() * allWords.length)];
-        if (!answers.find(w => w.word === randomWord.word)) {
-            answers.push(randomWord);
+        if (gameType === 'flashcard') {
+            document.getElementById('game-flashcard').classList.remove('hidden');
+            this.renderFlashcard();
+        } else if (gameType === 'quiz') {
+            document.getElementById('game-quiz').classList.remove('hidden');
+            this.renderQuiz();
+        } else if (gameType === 'memory') {
+            document.getElementById('game-memory').classList.remove('hidden');
+            this.renderMemoryGame();
+        } else if (gameType === 'sentence') {
+            document.getElementById('game-sentence').classList.remove('hidden');
+            this.renderSentenceGame();
+        } else if (gameType === 'scramble') {
+            document.getElementById('game-scramble').classList.remove('hidden');
+            this.renderScrambleGame();
         }
-        attempts++;
     }
 
-    // Shuffle
-    answers.sort(() => Math.random() - 0.5);
+    // FLASHCARD SPECIFIC
+    renderFlashcard() {
+        const state = this.gameState;
+        const word = state.words[state.currentIndex];
 
-    const grid = document.getElementById('quiz-answers');
-    grid.innerHTML = '';
+        // Reset Flip
+        const card = document.getElementById('flashcard');
+        card.classList.remove('rotate-y-180');
+        state.isFlipped = false;
 
-    answers.forEach(ans => {
-        const btn = document.createElement('button');
-        btn.className = 'bg-white border-2 border-indigo-100 py-4 px-6 rounded-2xl text-slate-600 font-medium hover:bg-indigo-50 hover:border-indigo-300 transition-all text-left shadow-sm active:scale-95';
-        btn.textContent = ans.meaning;
-        btn.onclick = () => this.handleQuizAnswer(btn, ans.word === word.word);
-        grid.appendChild(btn);
-    });
-}
+        // Update UI Text
+        setTimeout(() => { // Update text after flip reset starts to avoid spoiler (if going back)
+            document.getElementById('fc-current').textContent = state.currentIndex + 1;
+            document.getElementById('fc-total').textContent = state.words.length;
 
-handleQuizAnswer(btn, isCorrect) {
-    // Disable all buttons
-    const grid = document.getElementById('quiz-answers');
-    Array.from(grid.children).forEach(b => b.disabled = true);
+            document.getElementById('fc-front-word').textContent = word.word;
 
-    const fb = document.getElementById('quiz-feedback');
-    fb.classList.remove('opacity-0');
-
-    if (isCorrect) {
-        this.gameState.score += 10;
-        btn.classList.remove('border-indigo-100', 'bg-white');
-        btn.classList.add('border-green-500', 'bg-green-100', 'text-green-700');
-        fb.textContent = '🎉 Chính xác!';
-        fb.className = 'mt-8 h-8 text-center font-bold text-lg transition-opacity duration-300 text-green-500 animate-pop';
-    } else {
-        btn.classList.remove('border-indigo-100', 'bg-white');
-        btn.classList.add('border-red-500', 'bg-red-100', 'text-red-700');
-        fb.textContent = '😅 Sai rồi!';
-        fb.className = 'mt-8 h-8 text-center font-bold text-lg transition-opacity duration-300 text-red-500 animate-shake';
+            document.getElementById('fc-back-word').textContent = word.word;
+            document.getElementById('fc-back-ipa').textContent = word.ipa;
+            document.getElementById('fc-back-type').textContent = word.type || '';
+            document.getElementById('fc-back-mean').textContent = word.meaning;
+            document.getElementById('fc-back-ex').textContent = word.example || '';
+        }, 150);
     }
 
-    document.getElementById('quiz-score').textContent = this.gameState.score;
+    flipCard() {
+        const card = document.getElementById('flashcard');
+        this.gameState.isFlipped = !this.gameState.isFlipped;
 
-    // Next Question
-    setTimeout(() => {
+        if (this.gameState.isFlipped) {
+            card.classList.add('rotate-y-180');
+        } else {
+            card.classList.remove('rotate-y-180');
+        }
+    }
+
+    nextCard() {
         if (this.gameState.currentIndex < this.gameState.words.length - 1) {
             this.gameState.currentIndex++;
-            this.renderQuiz();
+            this.renderFlashcard();
         } else {
-            alert(`Kết thúc! Bạn đạt ${this.gameState.score} điểm.`);
-            this.saveGameResult('quiz', this.gameState.setId, `${this.gameState.score} điểm`);
+            alert('Đã hết bộ từ! Chúc mừng bạn đã hoàn thành ôn tập.');
             this.showGameDashboard();
         }
-    }, 1500);
-}
-
-// --- MEMORY MATCH GAME ---
-renderMemoryGame() {
-    const state = this.gameState;
-
-    // Setup initial grid if first run
-    if (state.currentIndex === 0 && !state.memoryCards) {
-        // Pick max 8 words for 16 cards (or fewer if set is small)
-        const words = state.words.slice(0, 8);
-        let cards = [];
-        words.forEach(w => {
-            cards.push({ id: w.word, type: 'word', content: w.word, matched: false });
-            cards.push({ id: w.word, type: 'meaning', content: w.meaning, matched: false });
-        });
-        // Shuffle
-        cards.sort(() => Math.random() - 0.5);
-        state.memoryCards = cards;
-        state.matchedPairs = 0;
-        state.totalPairs = words.length;
     }
 
-    document.getElementById('memory-pairs').textContent = state.totalPairs - state.matchedPairs;
-    const grid = document.getElementById('memory-grid');
-    grid.innerHTML = '';
+    prevCard() {
+        if (this.gameState.currentIndex > 0) {
+            this.gameState.currentIndex--;
+            this.renderFlashcard();
+        }
+    }
 
-    // Adjust grid cols based on card count if needed, but 4 is good standard
+    // QUIZ SPECIFIC
+    renderQuiz() {
+        const state = this.gameState;
+        const word = state.words[state.currentIndex];
 
-    state.memoryCards.forEach((card, index) => {
-        const cardEl = document.createElement('div');
-        // If matched, invisible or disabled style
-        if (card.matched) {
-            cardEl.className = 'h-32 bg-transparent border-2 border-dashed border-slate-200 rounded-xl flex items-center justify-center text-slate-300 select-none';
-            cardEl.innerHTML = '<i class="fa-solid fa-check"></i>';
+        // Reset Feedback
+        const fb = document.getElementById('quiz-feedback');
+        fb.classList.add('opacity-0');
+        fb.textContent = '';
+
+        document.getElementById('quiz-score').textContent = state.score;
+        document.getElementById('quiz-current').textContent = state.currentIndex + 1;
+        document.getElementById('quiz-total').textContent = state.words.length;
+        document.getElementById('quiz-question').textContent = word.word;
+
+        // Generate Answers
+        const answers = [word];
+        const allWords = state.words;
+
+        // Pick 3 unique distractors
+        let attempts = 0;
+        while (answers.length < 4 && attempts < 50) {
+            const randomWord = allWords[Math.floor(Math.random() * allWords.length)];
+            if (!answers.find(w => w.word === randomWord.word)) {
+                answers.push(randomWord);
+            }
+            attempts++;
+        }
+
+        // Shuffle
+        answers.sort(() => Math.random() - 0.5);
+
+        const grid = document.getElementById('quiz-answers');
+        grid.innerHTML = '';
+
+        answers.forEach(ans => {
+            const btn = document.createElement('button');
+            btn.className = 'bg-white border-2 border-indigo-100 py-4 px-6 rounded-2xl text-slate-600 font-medium hover:bg-indigo-50 hover:border-indigo-300 transition-all text-left shadow-sm active:scale-95';
+            btn.textContent = ans.meaning;
+            btn.onclick = () => this.handleQuizAnswer(btn, ans.word === word.word);
+            grid.appendChild(btn);
+        });
+    }
+
+    handleQuizAnswer(btn, isCorrect) {
+        // Disable all buttons
+        const grid = document.getElementById('quiz-answers');
+        Array.from(grid.children).forEach(b => b.disabled = true);
+
+        const fb = document.getElementById('quiz-feedback');
+        fb.classList.remove('opacity-0');
+
+        if (isCorrect) {
+            this.gameState.score += 10;
+            btn.classList.remove('border-indigo-100', 'bg-white');
+            btn.classList.add('border-green-500', 'bg-green-100', 'text-green-700');
+            fb.textContent = '🎉 Chính xác!';
+            fb.className = 'mt-8 h-8 text-center font-bold text-lg transition-opacity duration-300 text-green-500 animate-pop';
         } else {
-            // Check if currently flipped
-            const isFlipped = state.flippedCards.includes(index);
-            cardEl.className = `h-32 rounded-xl cursor-pointer transition-all duration-300 perspective-1000 relative group`;
-            cardEl.onclick = () => this.handleMemoryClick(index);
+            btn.classList.remove('border-indigo-100', 'bg-white');
+            btn.classList.add('border-red-500', 'bg-red-100', 'text-red-700');
+            fb.textContent = '😅 Sai rồi!';
+            fb.className = 'mt-8 h-8 text-center font-bold text-lg transition-opacity duration-300 text-red-500 animate-shake';
+        }
 
-            // Front (Hidden)
-            const front = document.createElement('div');
-            front.className = `absolute inset-0 bg-emerald-500 rounded-xl flex items-center justify-center text-white text-3xl shadow-md group-hover:bg-emerald-600 transition-colors ${isFlipped ? 'rotate-y-180 backface-hidden' : ''}`;
-            front.innerHTML = '<i class="fa-solid fa-question"></i>';
+        document.getElementById('quiz-score').textContent = this.gameState.score;
 
-            // Back (Content)
-            const back = document.createElement('div');
-            back.className = `absolute inset-0 bg-white border-2 border-emerald-500 rounded-xl flex items-center justify-center p-2 text-center shadow-md rotate-y-180 backface-hidden ${isFlipped ? 'rotate-0' : ''}`;
-            // Keep 'rotate-y-180' on back initially, but logic here is flip class applies to CONTAINER usually or we swap Opacity/Transform
-            // Let's use simpler logic: Class 'flipped' on container rotates it 180.
+        // Next Question
+        setTimeout(() => {
+            if (this.gameState.currentIndex < this.gameState.words.length - 1) {
+                this.gameState.currentIndex++;
+                this.renderQuiz();
+            } else {
+                alert(`Kết thúc! Bạn đạt ${this.gameState.score} điểm.`);
+                this.saveGameResult('quiz', this.gameState.setId, `${this.gameState.score} điểm`);
+                this.showGameDashboard();
+            }
+        }, 1500);
+    }
 
-            // REVISION: Simplify 3D flip for grid items
-            cardEl.className = `h-32 relative transform-style-3d transition-transform duration-500 cursor-pointer ${isFlipped ? 'rotate-y-180' : ''}`;
+    // --- MEMORY MATCH GAME ---
+    renderMemoryGame() {
+        const state = this.gameState;
 
-            const face = `absolute inset-0 backface-hidden rounded-xl flex items-center justify-center shadow-md select-none p-3 text-center text-sm font-bold`;
-            const frontFace = `${face} bg-emerald-100 text-emerald-600 border-2 border-emerald-200`; // The "Face Down" state in code logic is actually visible info? No.
-            // Wait, "Flip" means reveal. 
-            // Default state (not flipped) -> colorful back.
-            // Flipped state -> Content.
+        // Setup initial grid if first run
+        if (state.currentIndex === 0 && !state.memoryCards) {
+            // Pick max 8 words for 16 cards (or fewer if set is small)
+            const words = state.words.slice(0, 8);
+            let cards = [];
+            words.forEach(w => {
+                cards.push({ id: w.word, type: 'word', content: w.word, matched: false });
+                cards.push({ id: w.word, type: 'meaning', content: w.meaning, matched: false });
+            });
+            // Shuffle
+            cards.sort(() => Math.random() - 0.5);
+            state.memoryCards = cards;
+            state.matchedPairs = 0;
+            state.totalPairs = words.length;
+        }
 
-            const coverStyle = `${face} bg-emerald-500 text-white text-3xl z-10`; // Visible when NOT rotated
-            const contentStyle = `${face} bg-white border-2 border-emerald-500 text-slate-700 rotate-y-180`; // Visible when rotated
+        document.getElementById('memory-pairs').textContent = state.totalPairs - state.matchedPairs;
+        const grid = document.getElementById('memory-grid');
+        grid.innerHTML = '';
 
-            cardEl.innerHTML = `
+        // Adjust grid cols based on card count if needed, but 4 is good standard
+
+        state.memoryCards.forEach((card, index) => {
+            const cardEl = document.createElement('div');
+            // If matched, invisible or disabled style
+            if (card.matched) {
+                cardEl.className = 'h-32 bg-transparent border-2 border-dashed border-slate-200 rounded-xl flex items-center justify-center text-slate-300 select-none';
+                cardEl.innerHTML = '<i class="fa-solid fa-check"></i>';
+            } else {
+                // Check if currently flipped
+                const isFlipped = state.flippedCards.includes(index);
+                cardEl.className = `h-32 rounded-xl cursor-pointer transition-all duration-300 perspective-1000 relative group`;
+                cardEl.onclick = () => this.handleMemoryClick(index);
+
+                // Front (Hidden)
+                const front = document.createElement('div');
+                front.className = `absolute inset-0 bg-emerald-500 rounded-xl flex items-center justify-center text-white text-3xl shadow-md group-hover:bg-emerald-600 transition-colors ${isFlipped ? 'rotate-y-180 backface-hidden' : ''}`;
+                front.innerHTML = '<i class="fa-solid fa-question"></i>';
+
+                // Back (Content)
+                const back = document.createElement('div');
+                back.className = `absolute inset-0 bg-white border-2 border-emerald-500 rounded-xl flex items-center justify-center p-2 text-center shadow-md rotate-y-180 backface-hidden ${isFlipped ? 'rotate-0' : ''}`;
+                // Keep 'rotate-y-180' on back initially, but logic here is flip class applies to CONTAINER usually or we swap Opacity/Transform
+                // Let's use simpler logic: Class 'flipped' on container rotates it 180.
+
+                // REVISION: Simplify 3D flip for grid items
+                cardEl.className = `h-32 relative transform-style-3d transition-transform duration-500 cursor-pointer ${isFlipped ? 'rotate-y-180' : ''}`;
+
+                const face = `absolute inset-0 backface-hidden rounded-xl flex items-center justify-center shadow-md select-none p-3 text-center text-sm font-bold`;
+                const frontFace = `${face} bg-emerald-100 text-emerald-600 border-2 border-emerald-200`; // The "Face Down" state in code logic is actually visible info? No.
+                // Wait, "Flip" means reveal. 
+                // Default state (not flipped) -> colorful back.
+                // Flipped state -> Content.
+
+                const coverStyle = `${face} bg-emerald-500 text-white text-3xl z-10`; // Visible when NOT rotated
+                const contentStyle = `${face} bg-white border-2 border-emerald-500 text-slate-700 rotate-y-180`; // Visible when rotated
+
+                cardEl.innerHTML = `
                     <div class="${coverStyle}">
                         <i class="fa-solid fa-leaf"></i>
                     </div>
@@ -786,232 +784,232 @@ renderMemoryGame() {
                         ${card.content}
                     </div>
                 `;
-        }
-        grid.appendChild(cardEl);
-    });
-}
-
-handleMemoryClick(index) {
-    const state = this.gameState;
-    if (state.flippedCards.length >= 2 || state.flippedCards.includes(index)) return;
-
-    state.flippedCards.push(index);
-    this.renderMemoryGame();
-
-    if (state.flippedCards.length === 2) {
-        const idx1 = state.flippedCards[0];
-        const idx2 = state.flippedCards[1];
-        const card1 = state.memoryCards[idx1];
-        const card2 = state.memoryCards[idx2];
-
-        if (card1.id === card2.id) {
-            // Match!
-            setTimeout(() => {
-                card1.matched = true;
-                card2.matched = true;
-                state.flippedCards = [];
-                state.matchedPairs++;
-                this.renderMemoryGame();
-
-                if (state.matchedPairs === state.totalPairs) {
-                    alert("Xuất sắc! Bạn đã ghép đúng tất cả.");
-                    this.saveGameResult('memory', this.gameState.setId, 'Hoàn thành');
-                    this.showGameDashboard();
-                }
-            }, 800);
-        } else {
-            // No Match
-            setTimeout(() => {
-                state.flippedCards = [];
-                this.renderMemoryGame();
-            }, 1000);
-        }
-    }
-}
-
-// --- SENTENCE BUILDER GAME ---
-renderSentenceGame() {
-    const state = this.gameState;
-    const word = state.words[state.currentIndex];
-
-    // Ensure example exists
-    if (!word.example || word.example.trim() === '') {
-        // Skip invalid words or auto-win them
-        if (this.gameState.currentIndex < this.gameState.words.length - 1) {
-            this.gameState.currentIndex++;
-            this.renderSentenceGame();
-            return;
-        } else {
-            alert('Hoàn thành! (Một số từ không có ví dụ đã bị bỏ qua)');
-            this.showGameDashboard();
-            return;
-        }
-    }
-
-    const sentence = word.example;
-    // Regex to finding the word (case insensitive)
-    const regex = new RegExp(`\\b${word.word}\\b`, 'gi');
-    const hiddenSentence = sentence.replace(regex, '<span class="border-b-2 border-blue-400 text-blue-600 font-bold px-2 inline-block min-w-[50px] text-center">______</span>');
-
-    document.getElementById('sentence-current').textContent = state.currentIndex + 1;
-    document.getElementById('sentence-total').textContent = state.words.length;
-
-    document.getElementById('sentence-display').innerHTML = hiddenSentence;
-    document.getElementById('sentence-meaning').textContent = word.meaning;
-
-    // Generate Options
-    const options = [word.word];
-    const allWords = state.words;
-    let attempts = 0;
-    while (options.length < 4 && attempts < 50) {
-        const randomWord = allWords[Math.floor(Math.random() * allWords.length)].word;
-        if (!options.includes(randomWord)) options.push(randomWord);
-        attempts++;
-    }
-    options.sort(() => Math.random() - 0.5);
-
-    const grid = document.getElementById('sentence-options');
-    grid.innerHTML = '';
-    document.getElementById('sentence-feedback').className = 'mt-8 h-8 text-center font-bold text-lg transition-opacity duration-300 opacity-0';
-
-    options.forEach(opt => {
-        const btn = document.createElement('button');
-        btn.className = 'w-full py-3 px-4 bg-white border border-blue-200 rounded-xl text-slate-700 font-medium hover:bg-blue-50 hover:border-blue-400 transition-all shadow-sm';
-        btn.textContent = opt;
-        btn.onclick = () => this.handleSentenceGuess(btn, opt, word.word);
-        grid.appendChild(btn);
-    });
-}
-
-handleSentenceGuess(btn, guess, actual) {
-    const grid = document.getElementById('sentence-options');
-    Array.from(grid.children).forEach(b => b.disabled = true);
-    const fb = document.getElementById('sentence-feedback');
-    fb.classList.remove('opacity-0');
-
-    if (guess.toLowerCase() === actual.toLowerCase()) {
-        btn.classList.add('bg-green-100', 'border-green-500', 'text-green-700');
-        fb.textContent = "Chính xác!";
-        fb.classList.add('text-green-500', 'animate-pop');
-    } else {
-        btn.classList.add('bg-red-100', 'border-red-500', 'text-red-700');
-        fb.textContent = `Sai rồi! Đáp án: ${actual}`;
-        fb.classList.add('text-red-500', 'animate-shake');
-    }
-
-    setTimeout(() => {
-        if (this.gameState.currentIndex < this.gameState.words.length - 1) {
-            this.gameState.currentIndex++;
-            this.renderSentenceGame();
-        } else {
-            alert('Bạn đã hoàn thành bài tập điền từ!');
-            this.saveGameResult('sentence', this.gameState.setId, 'Hoàn thành');
-            this.showGameDashboard();
-        }
-    }, 1500);
-}
-
-// --- WORD SCRAMBLE GAME ---
-renderScrambleGame() {
-    const state = this.gameState;
-    const word = state.words[state.currentIndex];
-
-    document.getElementById('scramble-current').textContent = state.currentIndex + 1;
-    document.getElementById('scramble-total').textContent = state.words.length;
-    document.getElementById('scramble-type').textContent = word.type || 'Word';
-    document.getElementById('scramble-meaning').textContent = word.meaning;
-
-    // Setup State
-    if (!state.currentScramble) {
-        const cleanWord = word.word.replace(/[^a-zA-Z]/g, '').toLowerCase(); // Remove spaces/symbols for simplicity? Or keep them? 
-        // Let's stick to simple words or phrases. If phrase, maybe just Scramble letters but keep spacing? 
-        // For simplicity, let's just scramble everything and assume single consecutive string.
-        const chars = cleanWord.split('');
-        state.scrambleTarget = cleanWord;
-        state.scrambleInputs = new Array(chars.length).fill(null);
-        state.scramblePool = [...chars].sort(() => Math.random() - 0.5).map((c, i) => ({ char: c, id: i, used: false }));
-        state.currentScramble = true;
-    }
-
-    // Render Slots
-    const slotsDiv = document.getElementById('scramble-slots');
-    slotsDiv.innerHTML = '';
-    state.scrambleInputs.forEach((val, idx) => {
-        const slot = document.createElement('div');
-        slot.className = `w-10 h-12 border-b-4 ${val ? 'border-purple-500 text-purple-600' : 'border-slate-200'} flex items-center justify-center text-2xl font-bold cursor-pointer transition-colors`;
-        slot.textContent = val ? val.char : '';
-        slot.onclick = () => {
-            if (val) {
-                // Return letter to pool
-                const poolItem = state.scramblePool.find(p => p.id === val.id);
-                if (poolItem) poolItem.used = false;
-                state.scrambleInputs[idx] = null;
-                this.renderScrambleGame(); // Re-render
             }
-        };
-        slotsDiv.appendChild(slot);
-    });
+            grid.appendChild(cardEl);
+        });
+    }
 
-    // Render Letters
-    const poolDiv = document.getElementById('scramble-letters');
-    poolDiv.innerHTML = '';
-    state.scramblePool.forEach(item => {
-        if (item.used) return; // Don't show used letters
+    handleMemoryClick(index) {
+        const state = this.gameState;
+        if (state.flippedCards.length >= 2 || state.flippedCards.includes(index)) return;
 
-        const letter = document.createElement('button');
-        letter.className = 'w-10 h-10 bg-white border border-slate-200 rounded-lg shadow-sm font-bold text-slate-600 hover:bg-purple-50 hover:text-purple-600 active:scale-95 transition-all';
-        letter.textContent = item.char.toUpperCase();
-        letter.onclick = () => {
-            // Find first empty slot
-            const emptyIdx = state.scrambleInputs.findIndex(x => x === null);
-            if (emptyIdx !== -1) {
-                state.scrambleInputs[emptyIdx] = item;
-                item.used = true;
-                this.renderScrambleGame();
-                this.checkScrambleWin();
+        state.flippedCards.push(index);
+        this.renderMemoryGame();
+
+        if (state.flippedCards.length === 2) {
+            const idx1 = state.flippedCards[0];
+            const idx2 = state.flippedCards[1];
+            const card1 = state.memoryCards[idx1];
+            const card2 = state.memoryCards[idx2];
+
+            if (card1.id === card2.id) {
+                // Match!
+                setTimeout(() => {
+                    card1.matched = true;
+                    card2.matched = true;
+                    state.flippedCards = [];
+                    state.matchedPairs++;
+                    this.renderMemoryGame();
+
+                    if (state.matchedPairs === state.totalPairs) {
+                        alert("Xuất sắc! Bạn đã ghép đúng tất cả.");
+                        this.saveGameResult('memory', this.gameState.setId, 'Hoàn thành');
+                        this.showGameDashboard();
+                    }
+                }, 800);
+            } else {
+                // No Match
+                setTimeout(() => {
+                    state.flippedCards = [];
+                    this.renderMemoryGame();
+                }, 1000);
             }
-        };
-        poolDiv.appendChild(letter);
-    });
+        }
+    }
 
-    // Reset feedback
-    const fb = document.getElementById('scramble-feedback');
-    fb.className = 'mt-8 h-8 text-center font-bold text-lg transition-opacity duration-300 opacity-0';
-}
+    // --- SENTENCE BUILDER GAME ---
+    renderSentenceGame() {
+        const state = this.gameState;
+        const word = state.words[state.currentIndex];
 
-checkScrambleWin() {
-    const state = this.gameState;
-    // Check if full
-    if (state.scrambleInputs.some(x => x === null)) return;
-
-    const formedWord = state.scrambleInputs.map(x => x.char).join('');
-    const fb = document.getElementById('scramble-feedback');
-    fb.classList.remove('opacity-0');
-
-    if (formedWord === state.scrambleTarget) {
-        fb.textContent = "Chính xác!";
-        fb.classList.add('text-green-500', 'animate-pop');
-
-        setTimeout(() => {
-            state.currentScramble = false; // Reset for next word
+        // Ensure example exists
+        if (!word.example || word.example.trim() === '') {
+            // Skip invalid words or auto-win them
             if (this.gameState.currentIndex < this.gameState.words.length - 1) {
                 this.gameState.currentIndex++;
-                this.renderScrambleGame();
+                this.renderSentenceGame();
+                return;
             } else {
-                alert('Chúc mừng! Bạn đã hoàn thành trò chơi sắp xếp từ.');
-                this.saveGameResult('scramble', this.gameState.setId, 'Hoàn thành');
+                alert('Hoàn thành! (Một số từ không có ví dụ đã bị bỏ qua)');
+                this.showGameDashboard();
+                return;
+            }
+        }
+
+        const sentence = word.example;
+        // Regex to finding the word (case insensitive)
+        const regex = new RegExp(`\\b${word.word}\\b`, 'gi');
+        const hiddenSentence = sentence.replace(regex, '<span class="border-b-2 border-blue-400 text-blue-600 font-bold px-2 inline-block min-w-[50px] text-center">______</span>');
+
+        document.getElementById('sentence-current').textContent = state.currentIndex + 1;
+        document.getElementById('sentence-total').textContent = state.words.length;
+
+        document.getElementById('sentence-display').innerHTML = hiddenSentence;
+        document.getElementById('sentence-meaning').textContent = word.meaning;
+
+        // Generate Options
+        const options = [word.word];
+        const allWords = state.words;
+        let attempts = 0;
+        while (options.length < 4 && attempts < 50) {
+            const randomWord = allWords[Math.floor(Math.random() * allWords.length)].word;
+            if (!options.includes(randomWord)) options.push(randomWord);
+            attempts++;
+        }
+        options.sort(() => Math.random() - 0.5);
+
+        const grid = document.getElementById('sentence-options');
+        grid.innerHTML = '';
+        document.getElementById('sentence-feedback').className = 'mt-8 h-8 text-center font-bold text-lg transition-opacity duration-300 opacity-0';
+
+        options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'w-full py-3 px-4 bg-white border border-blue-200 rounded-xl text-slate-700 font-medium hover:bg-blue-50 hover:border-blue-400 transition-all shadow-sm';
+            btn.textContent = opt;
+            btn.onclick = () => this.handleSentenceGuess(btn, opt, word.word);
+            grid.appendChild(btn);
+        });
+    }
+
+    handleSentenceGuess(btn, guess, actual) {
+        const grid = document.getElementById('sentence-options');
+        Array.from(grid.children).forEach(b => b.disabled = true);
+        const fb = document.getElementById('sentence-feedback');
+        fb.classList.remove('opacity-0');
+
+        if (guess.toLowerCase() === actual.toLowerCase()) {
+            btn.classList.add('bg-green-100', 'border-green-500', 'text-green-700');
+            fb.textContent = "Chính xác!";
+            fb.classList.add('text-green-500', 'animate-pop');
+        } else {
+            btn.classList.add('bg-red-100', 'border-red-500', 'text-red-700');
+            fb.textContent = `Sai rồi! Đáp án: ${actual}`;
+            fb.classList.add('text-red-500', 'animate-shake');
+        }
+
+        setTimeout(() => {
+            if (this.gameState.currentIndex < this.gameState.words.length - 1) {
+                this.gameState.currentIndex++;
+                this.renderSentenceGame();
+            } else {
+                alert('Bạn đã hoàn thành bài tập điền từ!');
+                this.saveGameResult('sentence', this.gameState.setId, 'Hoàn thành');
                 this.showGameDashboard();
             }
-        }, 1000);
-    } else {
-        fb.textContent = "Chưa đúng, thử lại nhé!";
-        fb.classList.add('text-red-500', 'animate-shake');
-        // Auto clear? Or let user fix? Let user fix.
+        }, 1500);
     }
-}
 
-        // --- UTILS ---
+    // --- WORD SCRAMBLE GAME ---
+    renderScrambleGame() {
+        const state = this.gameState;
+        const word = state.words[state.currentIndex];
+
+        document.getElementById('scramble-current').textContent = state.currentIndex + 1;
+        document.getElementById('scramble-total').textContent = state.words.length;
+        document.getElementById('scramble-type').textContent = word.type || 'Word';
+        document.getElementById('scramble-meaning').textContent = word.meaning;
+
+        // Setup State
+        if (!state.currentScramble) {
+            const cleanWord = word.word.replace(/[^a-zA-Z]/g, '').toLowerCase(); // Remove spaces/symbols for simplicity? Or keep them? 
+            // Let's stick to simple words or phrases. If phrase, maybe just Scramble letters but keep spacing? 
+            // For simplicity, let's just scramble everything and assume single consecutive string.
+            const chars = cleanWord.split('');
+            state.scrambleTarget = cleanWord;
+            state.scrambleInputs = new Array(chars.length).fill(null);
+            state.scramblePool = [...chars].sort(() => Math.random() - 0.5).map((c, i) => ({ char: c, id: i, used: false }));
+            state.currentScramble = true;
+        }
+
+        // Render Slots
+        const slotsDiv = document.getElementById('scramble-slots');
+        slotsDiv.innerHTML = '';
+        state.scrambleInputs.forEach((val, idx) => {
+            const slot = document.createElement('div');
+            slot.className = `w-10 h-12 border-b-4 ${val ? 'border-purple-500 text-purple-600' : 'border-slate-200'} flex items-center justify-center text-2xl font-bold cursor-pointer transition-colors`;
+            slot.textContent = val ? val.char : '';
+            slot.onclick = () => {
+                if (val) {
+                    // Return letter to pool
+                    const poolItem = state.scramblePool.find(p => p.id === val.id);
+                    if (poolItem) poolItem.used = false;
+                    state.scrambleInputs[idx] = null;
+                    this.renderScrambleGame(); // Re-render
+                }
+            };
+            slotsDiv.appendChild(slot);
+        });
+
+        // Render Letters
+        const poolDiv = document.getElementById('scramble-letters');
+        poolDiv.innerHTML = '';
+        state.scramblePool.forEach(item => {
+            if (item.used) return; // Don't show used letters
+
+            const letter = document.createElement('button');
+            letter.className = 'w-10 h-10 bg-white border border-slate-200 rounded-lg shadow-sm font-bold text-slate-600 hover:bg-purple-50 hover:text-purple-600 active:scale-95 transition-all';
+            letter.textContent = item.char.toUpperCase();
+            letter.onclick = () => {
+                // Find first empty slot
+                const emptyIdx = state.scrambleInputs.findIndex(x => x === null);
+                if (emptyIdx !== -1) {
+                    state.scrambleInputs[emptyIdx] = item;
+                    item.used = true;
+                    this.renderScrambleGame();
+                    this.checkScrambleWin();
+                }
+            };
+            poolDiv.appendChild(letter);
+        });
+
+        // Reset feedback
+        const fb = document.getElementById('scramble-feedback');
+        fb.className = 'mt-8 h-8 text-center font-bold text-lg transition-opacity duration-300 opacity-0';
     }
+
+    checkScrambleWin() {
+        const state = this.gameState;
+        // Check if full
+        if (state.scrambleInputs.some(x => x === null)) return;
+
+        const formedWord = state.scrambleInputs.map(x => x.char).join('');
+        const fb = document.getElementById('scramble-feedback');
+        fb.classList.remove('opacity-0');
+
+        if (formedWord === state.scrambleTarget) {
+            fb.textContent = "Chính xác!";
+            fb.classList.add('text-green-500', 'animate-pop');
+
+            setTimeout(() => {
+                state.currentScramble = false; // Reset for next word
+                if (this.gameState.currentIndex < this.gameState.words.length - 1) {
+                    this.gameState.currentIndex++;
+                    this.renderScrambleGame();
+                } else {
+                    alert('Chúc mừng! Bạn đã hoàn thành trò chơi sắp xếp từ.');
+                    this.saveGameResult('scramble', this.gameState.setId, 'Hoàn thành');
+                    this.showGameDashboard();
+                }
+            }, 1000);
+        } else {
+            fb.textContent = "Chưa đúng, thử lại nhé!";
+            fb.classList.add('text-red-500', 'animate-shake');
+            // Auto clear? Or let user fix? Let user fix.
+        }
+    }
+
+    // --- UTILS ---
+}
 
 // Init App Globally
 window.app = new App();
