@@ -234,11 +234,11 @@ class App {
         const tr = document.createElement('tr');
 
         tr.innerHTML = `
-            <td><input type="text" class="vocab-input font-medium text-slate-700" placeholder="Nhập từ..." onblur="app.handleWordInput(this, ${idx})"></td>
-            <td><input type="text" class="vocab-input text-slate-500" placeholder="/.../" id="ipa-${idx}"></td>
-            <td><input type="text" class="vocab-input text-slate-500" placeholder="Loại từ..." id="type-${idx}"></td>
-            <td><input type="text" class="vocab-input text-slate-500" placeholder="Nghĩa..." id="meaning-${idx}"></td>
-            <td><input type="text" class="vocab-input text-slate-500 italic" placeholder="Ví dụ..." id="example-${idx}"></td>
+            <td><input type="text" class="vocab-input font-medium text-slate-700" placeholder="" onblur="app.handleWordInput(this, ${idx})"></td>
+            <td><input type="text" class="vocab-input text-slate-500" placeholder="" id="ipa-${idx}"></td>
+            <td><input type="text" class="vocab-input text-slate-500" placeholder="" id="type-${idx}"></td>
+            <td><input type="text" class="vocab-input text-slate-500" placeholder="" id="meaning-${idx}"></td>
+            <td><input type="text" class="vocab-input text-slate-500 italic" placeholder="" id="example-${idx}"></td>
             <td class="text-center">
                 <button class="text-slate-300 hover:text-red-500" onclick="this.closest('tr').remove()"><i class="fa-solid fa-trash"></i></button>
             </td>
