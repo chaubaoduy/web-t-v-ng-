@@ -249,7 +249,31 @@ class App {
         const inputs = tr.querySelectorAll('input');
         inputs.forEach(input => {
             input.addEventListener('input', () => this.autoResize(input));
+            input.addEventListener('keydown', (e) => this.handleInputKeydown(e, idx));
         });
+    }
+
+    handleInputKeydown(e, currentRowIdx) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+
+            // Check if we need to add a new row (if this is the last row)
+            const tbody = document.getElementById('input-rows');
+            if (currentRowIdx === tbody.children.length - 1) {
+                this.addRow();
+            }
+
+            // Focus on the first input of the next row
+            // Small timeout to allow DOM update
+            setTimeout(() => {
+                // Find all first inputs in the table rows
+                const rows = tbody.querySelectorAll('tr');
+                if (rows[currentRowIdx + 1]) {
+                    const firstInput = rows[currentRowIdx + 1].querySelector('input');
+                    if (firstInput) firstInput.focus();
+                }
+            }, 10);
+        }
     }
 
     autoResize(input) {
@@ -270,10 +294,10 @@ class App {
         if (!word) return;
 
         // Auto add next row if this is the last row
-        const tbody = document.getElementById('input-rows');
-        if (tbody.children.length === idx + 1) {
-            this.addRow();
-        }
+        // const tbody = document.getElementById('input-rows');
+        // if (tbody.children.length === idx + 1) {
+        //     this.addRow();
+        // }
 
         // Add loading state
         input.parentElement.classList.add('animate-pulse');
