@@ -539,6 +539,8 @@ class App {
         document.getElementById('game-memory').classList.add('hidden');
         document.getElementById('game-sentence').classList.add('hidden');
         document.getElementById('game-scramble').classList.add('hidden');
+        // Restore main scrollbar
+        document.querySelector('main').style.overflow = 'auto';
     }
 
     prepareGame(gameType) {
@@ -596,6 +598,8 @@ class App {
             this.renderQuiz();
         } else if (gameType === 'memory') {
             document.getElementById('game-memory').classList.remove('hidden');
+            // Hide main scrollbar for memory game
+            document.querySelector('main').style.overflow = 'hidden';
             this.renderMemoryGame();
         } else if (gameType === 'sentence') {
             document.getElementById('game-sentence').classList.remove('hidden');
@@ -745,8 +749,8 @@ class App {
 
         // Setup initial grid if first run
         if (state.currentIndex === 0 && !state.memoryCards) {
-            // Pick max 8 words for 16 cards (or fewer if set is small)
-            const words = state.words.slice(0, 8);
+            // Use all words in the set (no limit)
+            const words = state.words;
             let cards = [];
             words.forEach(w => {
                 cards.push({ id: w.word, type: 'word', content: w.word, matched: false });
@@ -763,51 +767,100 @@ class App {
         const grid = document.getElementById('memory-grid');
         grid.innerHTML = '';
 
-        // Adjust grid cols based on card count if needed, but 4 is good standard
+        // Calculate optimal grid layout based on card count
+        const cardCount = state.memoryCards.length;
+        let cols, rows;
+
+        // Determine best column count for the number of cards to fit in rectangular grid
+        if (cardCount <= 4) {
+            cols = 2;
+        } else if (cardCount <= 6) {
+            cols = 3;
+        } else if (cardCount <= 12) {
+            cols = 4;
+        } else if (cardCount <= 20) {
+            cols = 5;
+        } else if (cardCount <= 30) {
+            cols = 6;
+        } else if (cardCount <= 42) {
+            cols = 7;
+        } else if (cardCount <= 56) {
+            cols = 8;
+        } else if (cardCount <= 72) {
+            cols = 9;
+        } else {
+            cols = 10;
+        }
+
+        rows = Math.ceil(cardCount / cols);
+
+        // Get actual container dimensions
+        const container = grid.parentElement;
+        const containerHeight = container.clientHeight || 550;
+        const containerWidth = container.clientWidth || 850;
+
+        const gap = 4; // gap-1 = 4px
+
+        // Calculate card dimensions to fit exactly within available space
+        const cardHeight = Math.floor((containerHeight - (rows - 1) * gap - 10) / rows);
+        const cardWidth = Math.floor((containerWidth - (cols - 1) * gap - 10) / cols);
+
+        // Use smaller dimension to ensure cards fit (make them more square-ish)
+        const finalCardHeight = Math.max(30, Math.min(cardHeight, 100));
+
+        // Determine font size based on card size
+        let fontSize = 'text-sm';
+        let iconSize = 'text-lg';
+        if (finalCardHeight < 50) {
+            fontSize = 'text-[10px]';
+            iconSize = 'text-sm';
+        } else if (finalCardHeight < 70) {
+            fontSize = 'text-xs';
+            iconSize = 'text-base';
+        } else if (finalCardHeight >= 90) {
+            fontSize = 'text-base';
+            iconSize = 'text-xl';
+        }
+
+        // Update grid columns and rows dynamically
+        grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+        grid.style.gridTemplateRows = `repeat(${rows}, ${finalCardHeight}px)`;
+        grid.style.gap = `${gap}px`;
+        grid.style.maxHeight = `${containerHeight}px`;
 
         state.memoryCards.forEach((card, index) => {
             const cardEl = document.createElement('div');
+
             // If matched, invisible or disabled style
             if (card.matched) {
-                cardEl.className = 'h-32 bg-transparent border-2 border-dashed border-slate-200 rounded-xl flex items-center justify-center text-slate-300 select-none';
+                cardEl.className = `bg-transparent border border-dashed border-slate-200 rounded-lg flex items-center justify-center text-slate-300 select-none ${fontSize}`;
                 cardEl.innerHTML = '<i class="fa-solid fa-check"></i>';
             } else {
                 // Check if currently flipped
                 const isFlipped = state.flippedCards.includes(index);
-                cardEl.className = `h-32 rounded-xl cursor-pointer transition-all duration-300 perspective-1000 relative group`;
+
+                cardEl.className = `relative transform-style-3d transition-transform duration-500 cursor-pointer ${isFlipped ? 'rotate-y-180' : ''}`;
                 cardEl.onclick = () => this.handleMemoryClick(index);
 
-                // Front (Hidden)
-                const front = document.createElement('div');
-                front.className = `absolute inset-0 bg-emerald-500 rounded-xl flex items-center justify-center text-white text-3xl shadow-md group-hover:bg-emerald-600 transition-colors ${isFlipped ? 'rotate-y-180 backface-hidden' : ''}`;
-                front.innerHTML = '<i class="fa-solid fa-question"></i>';
+                const face = `absolute inset-0 backface-hidden rounded-lg flex items-center justify-center shadow-sm select-none p-0.5 text-center ${fontSize} font-bold overflow-hidden leading-tight`;
+                const coverStyle = `${face} bg-emerald-500 text-white ${iconSize} z-10`;
+                const contentStyle = `${face} bg-white border border-emerald-500 text-slate-700 rotate-y-180`;
 
-                // Back (Content)
-                const back = document.createElement('div');
-                back.className = `absolute inset-0 bg-white border-2 border-emerald-500 rounded-xl flex items-center justify-center p-2 text-center shadow-md rotate-y-180 backface-hidden ${isFlipped ? 'rotate-0' : ''}`;
-                // Keep 'rotate-y-180' on back initially, but logic here is flip class applies to CONTAINER usually or we swap Opacity/Transform
-                // Let's use simpler logic: Class 'flipped' on container rotates it 180.
-
-                // REVISION: Simplify 3D flip for grid items
-                cardEl.className = `h-32 relative transform-style-3d transition-transform duration-500 cursor-pointer ${isFlipped ? 'rotate-y-180' : ''}`;
-
-                const face = `absolute inset-0 backface-hidden rounded-xl flex items-center justify-center shadow-md select-none p-3 text-center text-sm font-bold`;
-                const frontFace = `${face} bg-emerald-100 text-emerald-600 border-2 border-emerald-200`; // The "Face Down" state in code logic is actually visible info? No.
-                // Wait, "Flip" means reveal. 
-                // Default state (not flipped) -> colorful back.
-                // Flipped state -> Content.
-
-                const coverStyle = `${face} bg-emerald-500 text-white text-3xl z-10`; // Visible when NOT rotated
-                const contentStyle = `${face} bg-white border-2 border-emerald-500 text-slate-700 rotate-y-180`; // Visible when rotated
+                // Truncate long content for small cards
+                let displayContent = card.content || '';
+                const maxChars = finalCardHeight < 50 ? 12 : (finalCardHeight < 70 ? 18 : 25);
+                if (displayContent.length > maxChars) {
+                    displayContent = displayContent.substring(0, maxChars - 2) + '..';
+                }
 
                 cardEl.innerHTML = `
-            <div class="${coverStyle}">
-                <i class="fa-solid fa-leaf"></i>
-            </div>
-            <div class="${contentStyle}">
-                ${card.content}
-            </div>
-        `;
+                    <div class="${coverStyle}">
+                        <i class="fa-solid fa-leaf"></i>
+                    </div>
+                    <div class="${contentStyle}">
+                        ${displayContent}
+                    </div>
+                `;
             }
             grid.appendChild(cardEl);
         });

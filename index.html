@@ -138,7 +138,7 @@
             </section>
 
             <!-- SECTION 3: GAMES (DASHBOARD) -->
-            <section id="view-games">
+            <section id="view-games" class="overflow-hidden">
                 <!-- 3.0: GAME DASHBOARD (Menu) -->
                 <div id="game-dashboard">
                     <h2 class="text-2xl font-bold text-slate-800 mb-2">Trung tâm Trò chơi</h2>
@@ -330,8 +330,8 @@
             </div>
 
             <!-- 3.4: MEMORY MATCH GAME UI -->
-            <div id="game-memory" class="hidden h-[600px] flex flex-col">
-                <div class="flex justify-between items-center mb-6">
+            <div id="game-memory" class="hidden h-[600px] flex flex-col overflow-hidden">
+                <div class="flex justify-between items-center mb-2 flex-shrink-0">
                     <button onclick="app.showGameDashboard()"
                         class="text-slate-400 hover:text-emerald-500 flex items-center gap-2">
                         <i class="fa-solid fa-xmark"></i> Thoát
@@ -340,8 +340,9 @@
                         Cặp còn lại: <span id="memory-pairs">0</span>
                     </div>
                 </div>
-                <div class="flex-1 overflow-y-auto p-4">
-                    <div id="memory-grid" class="grid grid-cols-4 gap-4 max-w-3xl mx-auto">
+                <div class="flex-1 flex items-center justify-center overflow-hidden">
+                    <div id="memory-grid" class="grid gap-1 w-full max-w-4xl mx-auto"
+                        style="grid-template-columns: repeat(4, 1fr)">
                         <!-- Cards injected by JS -->
                     </div>
                 </div>

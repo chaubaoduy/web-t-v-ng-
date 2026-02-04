@@ -1,0 +1,31 @@
+﻿git : Pushing to http
+s://github.com/chauba
+oduy/web-t-v-ng-.git
+At line:1 char:1
++ git push -v origin 
+main 2>&1 | Out-File 
+-FilePath 
+push_result.txt -En 
+...
++ ~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~
+    + CategoryInfo   
+           : NotSpe  
+  cified: (Pushing   
+  to http...web-t    
+-v-ng-.git:Strin    
+g) [], RemoteExc    
+eption
+    + FullyQualified 
+   ErrorId : Native  
+  CommandError
+ 
+To https://github.com
+/chaubaoduy/web-t-v-n
+g-.git
+ = [up to date]      
+main -> main
+updating local 
+tracking ref 'refs/re
+motes/origin/main'
+Everything up-to-date
