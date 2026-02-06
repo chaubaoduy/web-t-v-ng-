@@ -15,10 +15,11 @@
     <div id="toast-container"></div>
     <canvas id="confetti-canvas"></canvas>
 
-    <div id="app-container">
-        <!-- Sidebar -->
-        <aside>
-            <div class="flex items-center gap-3 mb-10 px-2 cursor-pointer" onclick="app.toggleSettings()">
+    <div id="app-container" class="flex flex-col h-screen">
+        <!-- Top Navbar -->
+        <header class="glass-header flex items-center justify-between px-6 py-3 z-50 relative shrink-0">
+            <!-- Logo -->
+            <div class="flex items-center gap-3 cursor-pointer" onclick="app.toggleSettings()">
                 <div
                     class="w-10 h-10 logo-box rounded-xl flex items-center justify-center text-white shadow-lg animate-pulse">
                     <i class="fa-solid fa-robot"></i>
@@ -26,42 +27,44 @@
                 <div>
                     <h1 class="font-bold text-xl text-slate-800 leading-none">Vocab<span
                             class="text-purple-500">AI</span></h1>
-                    <p class="text-xs text-slate-400 mt-1">Powered by Gemini</p>
                 </div>
             </div>
 
-            <nav class="flex-1">
+            <!-- Navigation -->
+            <nav class="flex items-center gap-2">
                 <div class="nav-item active" onclick="app.navigate('learn')">
-                    <i class="fa-solid fa-pen-to-square w-6"></i>
-                    <span>Từ vựng cần học</span>
+                    <i class="fa-solid fa-pen-to-square"></i>
+                    <span>Học từ</span>
                 </div>
                 <div class="nav-item" onclick="app.navigate('review')">
-                    <i class="fa-solid fa-box-archive w-6"></i>
+                    <i class="fa-solid fa-box-archive"></i>
                     <span>Kho lưu trữ</span>
                 </div>
                 <div class="nav-item" onclick="app.navigate('games')">
-                    <i class="fa-solid fa-gamepad w-6"></i>
-                    <span>Trò chơi ôn tập</span>
+                    <i class="fa-solid fa-gamepad"></i>
+                    <span>Trò chơi</span>
                 </div>
                 <div class="nav-item" onclick="app.navigate('stats')">
-                    <i class="fa-solid fa-chart-pie w-6"></i>
-                    <span>Kết quả & Chỉ số</span>
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span>Kết quả</span>
                 </div>
             </nav>
 
-            <div class="border-t pt-4">
-                <div class="flex items-center gap-3 px-2">
-                    <div class="w-8 h-8 rounded-full bg-slate-200"></div>
-                    <div>
-                        <p class="text-sm font-medium text-slate-700">Người dùng</p>
-                        <p class="text-xs text-slate-400">Học viên</p>
-                    </div>
+            <!-- User Profile -->
+            <div class="flex items-center gap-3">
+                <div class="text-right hidden sm:block">
+                    <p class="text-sm font-medium text-slate-700">Người dùng</p>
+                    <p class="text-xs text-slate-500">Học viên</p>
+                </div>
+                <div class="w-8 h-8 rounded-full bg-slate-200 border border-white shadow-sm overflow-hidden">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="User"
+                        class="w-full h-full object-cover">
                 </div>
             </div>
-        </aside>
+        </header>
 
         <!-- Main Content -->
-        <main>
+        <main class="flex-1 overflow-y-auto p-6 relative">
 
             <!-- SECTION 1: LEARN (INPUT) -->
             <section id="view-learn" class="active">
