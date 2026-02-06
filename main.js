@@ -104,12 +104,12 @@ class App {
     saveApiKey() {
         const key = document.getElementById('api-key-input').value.trim();
         if (!key) {
-            alert('Vui lòng nhập Key!');
+            this.showToast('Vui lòng nhập Key!', 'error');
             return;
         }
         localStorage.setItem('gemini_api_key', key);
         this.toggleSettings();
-        alert('Đã lưu API Key! Giờ bạn có thể nhập từ vựng.');
+        this.showToast('Đã lưu API Key! Giờ bạn có thể nhập từ vựng.', 'success');
     }
 
     setupNavigation() {
@@ -237,7 +237,7 @@ class App {
         });
 
         if (words.length === 0) {
-            alert('Chưa có từ vựng nào để lưu!');
+            this.showToast('Chưa có từ vựng nào để lưu!', 'error');
             return;
         }
 
@@ -257,7 +257,7 @@ class App {
         };
 
         Store.saveSet(newSet);
-        alert('Đã lưu thành công! Bạn có thể xem trong "Kho lưu trữ".');
+        this.showToast('Đã lưu thành công! Bạn có thể xem trong "Kho lưu trữ".', 'success');
 
         // Clear inputs
         document.getElementById('input-rows').innerHTML = '';
@@ -280,7 +280,7 @@ class App {
 
         sets.forEach(set => {
             const card = document.createElement('div');
-            card.className = 'bg-white p-5 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-all group relative';
+            card.className = 'glass-card p-5 group relative';
             card.innerHTML = `
                 <div class="flex justify-between items-start mb-4">
                     <div class="w-10 h-10 rounded-full bg-sky-100 flex items-center justify-center text-sky-500 font-bold text-lg">
@@ -378,7 +378,7 @@ class App {
             // Show last 10 results
             results.slice(0, 10).forEach(res => {
                 const tr = document.createElement('tr');
-                tr.className = 'border-b border-slate-50 hover:bg-slate-50/50 transition-colors';
+                tr.className = 'border-b border-slate-200 hover:bg-white/30 transition-colors';
 
                 // Format Game Name
                 let gameName = res.type;
@@ -438,7 +438,7 @@ class App {
         // 1. Show Set Selection
         const sets = Store.getSets();
         if (sets.length === 0) {
-            alert('Bạn chưa có bộ từ vựng nào! Hãy vào phần "Học từ" để tạo trước nhé.');
+            this.showToast('Bạn chưa có bộ từ vựng nào! Hãy vào phần "Học từ" để tạo trước nhé.', 'info');
             return;
         }
 
@@ -450,7 +450,7 @@ class App {
 
         sets.forEach(set => {
             const btn = document.createElement('div');
-            btn.className = 'bg-white p-4 rounded-xl border border-slate-200 hover:border-sky-500 hover:bg-sky-50 cursor-pointer transition-all flex justify-between items-center group';
+            btn.className = 'glass-card p-4 cursor-pointer transition-all flex justify-between items-center group';
             btn.onclick = () => this.launchGame(gameType, set.id);
             btn.innerHTML = `
         <div>
@@ -542,7 +542,7 @@ class App {
             this.gameState.currentIndex++;
             this.renderFlashcard();
         } else {
-            alert('Đã hết bộ từ! Chúc mừng bạn đã hoàn thành ôn tập.');
+            this.showToast('Đã hết bộ từ!', 'info');
             this.showGameDashboard();
         }
     }
@@ -627,7 +627,8 @@ class App {
                 this.gameState.currentIndex++;
                 this.renderQuiz();
             } else {
-                alert(`Kết thúc! Bạn đạt ${this.gameState.score} điểm.`);
+                this.showToast(`Kết thúc! Bạn đạt ${this.gameState.score} điểm.`, 'success');
+                this.fireConfetti();
                 this.saveGameResult('quiz', this.gameState.setId, `${this.gameState.score} điểm`);
                 this.showGameDashboard();
             }
@@ -780,7 +781,8 @@ class App {
                     this.renderMemoryGame();
 
                     if (state.matchedPairs === state.totalPairs) {
-                        alert("Xuất sắc! Bạn đã ghép đúng tất cả.");
+                        this.showToast("Xuất sắc! Bạn đã ghép đúng tất cả.", 'success');
+                        this.fireConfetti();
                         this.saveGameResult('memory', this.gameState.setId, 'Hoàn thành');
                         this.showGameDashboard();
                     }
@@ -808,7 +810,7 @@ class App {
                 this.renderSentenceGame();
                 return;
             } else {
-                alert('Hoàn thành! (Một số từ không có ví dụ đã bị bỏ qua)');
+                this.showToast('Hoàn thành! (Một số từ không có ví dụ đã bị bỏ qua)', 'success');
                 this.showGameDashboard();
                 return;
             }
@@ -870,7 +872,8 @@ class App {
                 this.gameState.currentIndex++;
                 this.renderSentenceGame();
             } else {
-                alert('Bạn đã hoàn thành bài tập điền từ!');
+                this.showToast('Bạn đã hoàn thành bài tập điền từ!', 'success');
+                this.fireConfetti();
                 this.saveGameResult('sentence', this.gameState.setId, 'Hoàn thành');
                 this.showGameDashboard();
             }
@@ -964,7 +967,8 @@ class App {
                     this.gameState.currentIndex++;
                     this.renderScrambleGame();
                 } else {
-                    alert('Chúc mừng! Bạn đã hoàn thành trò chơi sắp xếp từ.');
+                    this.showToast('Chúc mừng! Bạn đã hoàn thành trò chơi sắp xếp từ.', 'success');
+                    this.fireConfetti();
                     this.saveGameResult('scramble', this.gameState.setId, 'Hoàn thành');
                     this.showGameDashboard();
                 }
@@ -977,6 +981,95 @@ class App {
     }
 
     // --- UTILS ---
+    showToast(msg, type = 'info') {
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+        const div = document.createElement('div');
+        div.className = `toast ${type}`;
+        div.innerHTML = `<i class="fa-solid ${type === 'success' ? 'fa-check' : type === 'error' ? 'fa-triangle-exclamation' : 'fa-circle-info'}"></i> <span>${msg}</span>`;
+        container.appendChild(div);
+
+        // Play sound
+        this.playSound(type);
+
+        setTimeout(() => {
+            div.style.animation = 'toastSlideOut 0.4s forwards';
+            setTimeout(() => div.remove(), 400);
+        }, 3000);
+    }
+
+    playSound(type) {
+        // Simple Web Audio
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+
+            const now = ctx.currentTime;
+
+            if (type === 'success') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(500, now);
+                osc.frequency.exponentialRampToValueAtTime(1000, now + 0.1);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+                osc.start(now);
+                osc.stop(now + 0.5);
+            } else if (type === 'error') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.linearRampToValueAtTime(100, now + 0.2);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'info') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(800, now);
+                gain.gain.setValueAtTime(0.05, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+                osc.start(now);
+                osc.stop(now + 0.1);
+            }
+        } catch (e) { console.error(e); }
+    }
+
+    fireConfetti() {
+        // Simple Canvas Confetti
+        const canvas = document.getElementById('confetti-canvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const particles = [];
+        for (let i = 0; i < 100; i++) {
+            particles.push({
+                x: canvas.width / 2, y: canvas.height / 2,
+                vx: (Math.random() - 0.5) * 10, vy: (Math.random() - 0.5) * 10 - 5,
+                c: `hsl(${Math.random() * 360}, 100%, 50%)`,
+                size: Math.random() * 5 + 2
+            });
+        }
+
+        let frame = 0;
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach((p, idx) => {
+                p.x += p.vx; p.y += p.vy; p.vy += 0.2; // gravity
+                ctx.fillStyle = p.c;
+                ctx.fillRect(p.x, p.y, p.size, p.size);
+            });
+            frame++;
+            if (frame < 100) requestAnimationFrame(animate);
+            else ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+        animate();
+        this.playSound('success'); // Extra chime
+    }
+
 }
 
 // Init App Globally

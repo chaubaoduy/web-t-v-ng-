@@ -11,13 +11,16 @@
 </head>
 
 <body>
+    <!-- Toast & Effects -->
+    <div id="toast-container"></div>
+    <canvas id="confetti-canvas"></canvas>
 
     <div id="app-container">
         <!-- Sidebar -->
         <aside>
             <div class="flex items-center gap-3 mb-10 px-2 cursor-pointer" onclick="app.toggleSettings()">
                 <div
-                    class="w-10 h-10 bg-gradient-to-tr from-purple-500 to-pink-500 rounded-xl flex items-center justify-center text-white shadow-lg animate-pulse">
+                    class="w-10 h-10 logo-box rounded-xl flex items-center justify-center text-white shadow-lg animate-pulse">
                     <i class="fa-solid fa-robot"></i>
                 </div>
                 <div>
@@ -73,7 +76,7 @@
                     </button>
                 </div>
 
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                <div class="glass-card overflow-hidden">
                     <table class="vocab-table">
                         <thead>
                             <tr>
@@ -146,7 +149,7 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <!-- Game Card 1: Flashcards -->
-                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow cursor-pointer group"
+                        <div class="glass-card p-6 hover:shadow-lg transition-shadow cursor-pointer group"
                             onclick="app.prepareGame('flashcard')">
                             <div
                                 class="w-14 h-14 bg-orange-100 rounded-2xl flex items-center justify-center text-orange-500 text-2xl mb-4 group-hover:scale-110 transition-transform">
@@ -157,7 +160,7 @@
                         </div>
 
                         <!-- Game Card 2: Quiz -->
-                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow cursor-pointer group"
+                        <div class="glass-card p-6 hover:shadow-lg transition-shadow cursor-pointer group"
                             onclick="app.prepareGame('quiz')">
                             <div
                                 class="w-14 h-14 bg-indigo-100 rounded-2xl flex items-center justify-center text-indigo-500 text-2xl mb-4 group-hover:scale-110 transition-transform">
@@ -168,7 +171,7 @@
                         </div>
 
                         <!-- Game Card 3: Memory Match -->
-                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow cursor-pointer group"
+                        <div class="glass-card p-6 hover:shadow-lg transition-shadow cursor-pointer group"
                             onclick="app.prepareGame('memory')">
                             <div
                                 class="w-14 h-14 bg-emerald-100 rounded-2xl flex items-center justify-center text-emerald-500 text-2xl mb-4 group-hover:scale-110 transition-transform">
@@ -179,7 +182,7 @@
                         </div>
 
                         <!-- Game Card 4: Sentence Builder -->
-                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow cursor-pointer group"
+                        <div class="glass-card p-6 hover:shadow-lg transition-shadow cursor-pointer group"
                             onclick="app.prepareGame('sentence')">
                             <div
                                 class="w-14 h-14 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-500 text-2xl mb-4 group-hover:scale-110 transition-transform">
@@ -190,7 +193,7 @@
                         </div>
 
                         <!-- Game Card 5: Word Scramble -->
-                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow cursor-pointer group"
+                        <div class="glass-card p-6 hover:shadow-lg transition-shadow cursor-pointer group"
                             onclick="app.prepareGame('scramble')">
                             <div
                                 class="w-14 h-14 bg-purple-100 rounded-2xl flex items-center justify-center text-purple-500 text-2xl mb-4 group-hover:scale-110 transition-transform">
@@ -416,7 +419,7 @@
 
                 <!-- Summary Cards -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4">
+                    <div class="glass-card p-6 flex items-center gap-4">
                         <div
                             class="w-12 h-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xl">
                             <i class="fa-solid fa-book"></i>
@@ -426,7 +429,7 @@
                             <h3 class="text-2xl font-bold text-slate-800" id="stat-total-words">0</h3>
                         </div>
                     </div>
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4">
+                    <div class="glass-card p-6 flex items-center gap-4">
                         <div
                             class="w-12 h-12 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-xl">
                             <i class="fa-solid fa-layer-group"></i>
@@ -436,7 +439,7 @@
                             <h3 class="text-2xl font-bold text-slate-800" id="stat-total-sets">0</h3>
                         </div>
                     </div>
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4">
+                    <div class="glass-card p-6 flex items-center gap-4">
                         <div
                             class="w-12 h-12 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-xl">
                             <i class="fa-solid fa-gamepad"></i>
@@ -449,7 +452,7 @@
                 </div>
 
                 <!-- Recent Activity -->
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                <div class="glass-card overflow-hidden">
                     <div class="p-6 border-b border-slate-50">
                         <h3 class="font-bold text-slate-800">Hoạt động gần đây</h3>
                     </div>
