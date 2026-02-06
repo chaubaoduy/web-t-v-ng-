@@ -132,20 +132,17 @@ class App {
             document.querySelectorAll('.nav-item')[idx].classList.add('active');
         }
 
-        // Update View
-        document.querySelectorAll('section').forEach(el => el.classList.remove('active'));
+        // Scroll to Section
         const targetSection = document.getElementById(`view-${viewId}`);
-        if (targetSection) targetSection.classList.add('active');
+        if (targetSection) {
+            targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
 
         if (viewId === 'review') {
             this.renderSets();
         } else if (viewId === 'stats') {
             this.renderStats();
         }
-
-        // Auto scroll to top of content
-        const main = document.querySelector('main');
-        if (main) main.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     // --- INPUT TABLE LOGIC ---
