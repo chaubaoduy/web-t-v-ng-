@@ -164,9 +164,12 @@ class App {
 
         // Auto-focus first input on load
         setTimeout(() => {
-            const firstInput = document.querySelector('.vocab-input');
-            if (firstInput) firstInput.focus();
-        }, 300);
+            const firstRowInput = document.querySelector('#input-rows tr:first-child .vocab-input');
+            if (firstRowInput) {
+                firstRowInput.focus();
+                // Ensure the highlight style is applied by triggering a focus event if needed (browsers usually handle this)
+            }
+        }, 500);
     }
 
     navigate(viewId) {
