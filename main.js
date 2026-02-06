@@ -120,6 +120,17 @@ class App {
                 this.navigate(maps[index]);
             });
         });
+
+        // Global Input Listener for "Filled" state (Persist Blue Border)
+        document.addEventListener('input', (e) => {
+            if (e.target.classList.contains('vocab-input')) {
+                if (e.target.value.trim() !== '') {
+                    e.target.classList.add('filled');
+                } else {
+                    e.target.classList.remove('filled');
+                }
+            }
+        });
     }
 
     navigate(viewId) {
