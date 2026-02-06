@@ -163,7 +163,6 @@ main {
 
 /* Row-wide Focus - Highlights all inputs in the row when one is focused */
 .vocab-table tr:focus-within .vocab-input {
-    background: white;
     border-color: #3b82f6 !important;
     box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1) !important;
 }
