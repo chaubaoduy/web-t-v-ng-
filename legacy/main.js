@@ -68,7 +68,7 @@ const Store = {
 
             const validResults = results.filter(r => {
                 // Check if result has ID (timestamp) and is within 7 days
-                if (!r.id) return false;
+                if (!r || !r.id) return false;
                 return (now - r.id) < sevenDays;
             });
 
@@ -119,11 +119,18 @@ class App {
     }
 
     init() {
-        Store.cleanupOldResults(); // Auto-delete old results
+        console.log("App initializing...");
+        try {
+            if (Store && Store.cleanupOldResults) {
+                Store.cleanupOldResults(); // Auto-delete old results
+            }
+        } catch (e) { console.error("Auto-cleanup failed", e); }
+
         this.addRow();
         this.renderSets();
         this.setupNavigation();
         this.loadAvatar();
+        console.log("App initialized successfully.");
     }
 
     // --- AVATAR LOGIC ---
