@@ -111,7 +111,8 @@ class App {
     }
 
     selectAvatar(seed) {
-        const url = `https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}`;
+        // seed is now an animal name like 'rat', 'bull', etc.
+        const url = `https://img.icons8.com/fluency/96/${seed}.png`;
         this.saveAndApplyAvatar(url);
     }
 
