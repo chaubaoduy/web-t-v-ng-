@@ -111,8 +111,12 @@ class App {
     }
 
     selectAvatar(seed) {
-        // seed is now an animal name like 'rat', 'bull', etc.
-        const url = `https://img.icons8.com/fluency/96/${seed}.png`;
+        let url;
+        if (seed === 'monkey-fluent') {
+            url = 'https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Monkey%20Face.png';
+        } else {
+            url = `https://img.icons8.com/fluency/96/${seed}.png`;
+        }
         this.saveAndApplyAvatar(url);
     }
 
