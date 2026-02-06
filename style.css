@@ -155,10 +155,10 @@ main {
 
 .vocab-input:focus {
     background: white;
-    border-color: #3b82f6;
+    border-color: #3b82f6 !important;
     /* Blue-500 Focus */
     outline: none;
-    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1) !important;
 }
 
 .vocab-input::placeholder {
