@@ -121,16 +121,26 @@ class App {
             });
         });
 
-        // Global Input Listener for "Filled" state (Persist Blue Border)
+        // Global Input Listener for "Filled" state
         document.addEventListener('input', (e) => {
             if (e.target.classList.contains('vocab-input')) {
-                if (e.target.value.trim() !== '') {
-                    e.target.classList.add('filled');
-                } else {
-                    e.target.classList.remove('filled');
-                }
+                e.target.classList.toggle('filled', e.target.value.trim() !== '');
             }
         });
+
+        // Global Keydown Listener for Enter Key (Add New Row)
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && e.target.classList.contains('vocab-input')) {
+                e.preventDefault();
+                this.addRow(null, true); // true = focus new row
+            }
+        });
+
+        // Auto-focus first input on load
+        setTimeout(() => {
+            const firstInput = document.querySelector('.vocab-input');
+            if (firstInput) firstInput.focus();
+        }, 300);
     }
 
     navigate(viewId) {
