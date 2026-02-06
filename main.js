@@ -90,26 +90,47 @@ class App {
         this.addRow();
         this.renderSets();
         this.setupNavigation();
-
-        // Load API Key to Input if exists
-        const key = localStorage.getItem('gemini_api_key');
-        if (key) document.getElementById('api-key-input').value = key;
+        this.loadAvatar();
     }
 
-    toggleSettings() {
-        const modal = document.getElementById('settings-modal');
-        modal.classList.toggle('hidden');
-    }
-
-    saveApiKey() {
-        const key = document.getElementById('api-key-input').value.trim();
-        if (!key) {
-            this.showToast('Vui lòng nhập Key!', 'error');
-            return;
+    // --- AVATAR LOGIC ---
+    loadAvatar() {
+        const stored = localStorage.getItem('user_avatar');
+        const img = document.getElementById('current-avatar');
+        if (stored && img) {
+            img.src = stored;
         }
-        localStorage.setItem('gemini_api_key', key);
-        this.toggleSettings();
-        this.showToast('Đã lưu API Key! Giờ bạn có thể nhập từ vựng.', 'success');
+    }
+
+    openAvatarModal() {
+        document.getElementById('avatar-modal').classList.remove('hidden');
+    }
+
+    closeAvatarModal() {
+        document.getElementById('avatar-modal').classList.add('hidden');
+    }
+
+    selectAvatar(seed) {
+        const url = `https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}`;
+        this.saveAndApplyAvatar(url);
+    }
+
+    handleAvatarUpload(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                this.saveAndApplyAvatar(e.target.result);
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    saveAndApplyAvatar(url) {
+        localStorage.setItem('user_avatar', url);
+        const img = document.getElementById('current-avatar');
+        if (img) img.src = url;
+        this.closeAvatarModal();
+        this.showToast('Đã cập nhật hình đại diện!', 'success');
     }
 
     setupNavigation() {
