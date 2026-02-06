@@ -39,14 +39,46 @@ const Store = {
     },
 
     getResults() {
-        const data = localStorage.getItem(this.KEYS.GAMES);
-        return data ? JSON.parse(data) : [];
+        try {
+            const data = localStorage.getItem(this.KEYS.GAMES);
+            const parsed = data ? JSON.parse(data) : [];
+            return Array.isArray(parsed) ? parsed : [];
+        } catch (e) {
+            console.error("Data corruption detected, resetting results.", e);
+            return [];
+        }
     },
 
     saveResult(result) {
-        const results = this.getResults();
-        results.unshift(result);
-        localStorage.setItem(this.KEYS.GAMES, JSON.stringify(results));
+        try {
+            const results = this.getResults();
+            results.unshift(result);
+            localStorage.setItem(this.KEYS.GAMES, JSON.stringify(results));
+        } catch (e) {
+            console.error("Save failed", e);
+            alert("Lỗi lưu dữ liệu: " + e.message);
+        }
+    },
+
+    cleanupOldResults() {
+        try {
+            const results = this.getResults();
+            const now = Date.now();
+            const sevenDays = 7 * 24 * 60 * 60 * 1000;
+
+            const validResults = results.filter(r => {
+                // Check if result has ID (timestamp) and is within 7 days
+                if (!r.id) return false;
+                return (now - r.id) < sevenDays;
+            });
+
+            if (results.length !== validResults.length) {
+                localStorage.setItem(this.KEYS.GAMES, JSON.stringify(validResults));
+                console.log(`Cleaned up ${results.length - validResults.length} old results.`);
+            }
+        } catch (e) {
+            console.error("Cleanup failed", e);
+        }
     }
 };
 
@@ -87,6 +119,7 @@ class App {
     }
 
     init() {
+        Store.cleanupOldResults(); // Auto-delete old results
         this.addRow();
         this.renderSets();
         this.setupNavigation();
@@ -440,6 +473,7 @@ class App {
                 if (res.type === 'memory') { gameName = 'Ghép thẻ'; icon = 'fa-table-cells'; color = 'text-emerald-500'; }
                 if (res.type === 'sentence') { gameName = 'Điền từ'; icon = 'fa-pen-nib'; color = 'text-blue-500'; }
                 if (res.type === 'scramble') { gameName = 'Sắp xếp từ'; icon = 'fa-spell-check'; color = 'text-purple-500'; }
+                if (res.type === 'flashcard') { gameName = 'Lật thẻ'; icon = 'fa-layer-group'; color = 'text-orange-500'; }
 
                 tr.innerHTML = `
         <td class="p-4 font-medium text-slate-700">
@@ -594,6 +628,7 @@ class App {
             this.renderFlashcard();
         } else {
             this.showToast('Đã hết bộ từ!', 'info');
+            this.saveGameResult('flashcard', this.gameState.setId, 'Hoàn thành');
             this.showGameDashboard();
         }
     }
