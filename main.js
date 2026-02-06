@@ -52,88 +52,7 @@ const Store = {
 
 // --- 2. INTELLIGENT VOCAB SERVICE ---
 // Expanded Dictionary with Manual High-Quality Examples & Phrase Support
-const localData = {
-    "hello": { mean: "Xin chào", ex: "Hello, it is nice to meet you.", type: "Thán từ", ipa: "/həˈləʊ/" },
-    "apple": { mean: "Quả táo", ex: "She eats a fresh apple every morning.", type: "Danh từ", ipa: "/ˈæp.l̩/" },
-    "make sense": { mean: "Có lý, dễ hiểu", ex: "His explanation didn't make sense to me.", type: "Cụm động từ", ipa: "/meɪk sens/" },
-    "look for": { mean: "Tìm kiếm", ex: "I am looking for my lost keys.", type: "Cụm động từ", ipa: "/lʊk fɔːr/" },
-    "give up": { mean: "Từ bỏ", ex: "Never give up on your dreams.", type: "Cụm động từ", ipa: "/ɡɪv ʌp/" },
-    "run out of": { mean: "Hết, cạn kiệt", ex: "We have run out of milk.", type: "Cụm động từ", ipa: "/rʌn aʊt əv/" },
-    "take care of": { mean: "Chăm sóc", ex: "Please take care of my cat while I am away.", type: "Cụm động từ", ipa: "/teɪk keər əv/" },
-    "communication": { mean: "Sự giao tiếp", ex: "Good communication is the key to a successful relationship.", ipa: "/kəˌmjuː.nɪˈkeɪ.ʃən/" },
-    "information": { mean: "Thông tin", ex: "You can find more information on our website.", ipa: "/ˌɪn.fəˈmeɪ.ʃən/" },
-    "education": { mean: "Giáo dục", ex: "Education is essential for personal development.", ipa: "/ˌedʒ.ʊˈkeɪ.ʃən/" },
-    "family": { mean: "Gia đình", ex: "He loves spending time with his family on weekends.", ipa: "/ˈfæm.əl.i/" },
-    "happiness": { mean: "Hạnh phúc", ex: "Money cannot buy true happiness.", ipa: "/ˈhæp.i.nəs/" },
-    "technology": { mean: "Công nghệ", ex: "Modern technology has changed the way we live.", ipa: "/tekˈnɒl.ə.dʒi/" },
-    "environment": { mean: "Môi trường", ex: "We must protect the environment for future generations.", ipa: "/ɪnˈvaɪ.rən.mənt/" },
-    "society": { mean: "Xã hội", ex: "Every individual plays a role in society.", ipa: "/səˈsaɪ.ə.ti/" },
-    "government": { mean: "Chính phủ", ex: "The government is implementing new policies.", ipa: "/ˈɡʌv.ən.mənt/" },
-    "health": { mean: "Sức khỏe", ex: "Eating vegetables is good for your health.", ipa: "/helθ/" }
-};
-
-const AI = {
-    async predict(word) {
-        const cleanWord = word.trim().toLowerCase();
-
-        // 1. Check Local Data First (Best for Phrases & Common Words)
-        if (localData[cleanWord]) {
-            return {
-                ipa: localData[cleanWord].ipa || "/.../",
-                type: localData[cleanWord].type || "Danh từ",
-                meaning: localData[cleanWord].mean,
-                example: localData[cleanWord].ex
-            };
-        }
-
-        try {
-            // 2. Fetch Real Data from Dictionary API
-            const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${cleanWord}`);
-            if (!response.ok) throw new Error('Not found');
-
-            const data = await response.json();
-            const entry = data[0];
-
-            // Extract best data
-            const ipa = entry.phonetic || (entry.phonetics.find(p => p.text)?.text) || "/.../";
-            const type = entry.meanings[0].partOfSpeech || "noun";
-
-            // Logic to find the BEST example (longest sentence)
-            let bestExample = "";
-            for (const meaning of entry.meanings) {
-                for (const def of meaning.definitions) {
-                    if (def.example && def.example.length > bestExample.length) {
-                        bestExample = def.example;
-                    }
-                }
-            }
-
-            // Fallback example template
-            if (!bestExample) {
-                bestExample = generateFallbackExample(cleanWord, type);
-            }
-
-            // Meaning (English def as fallback)
-            const meaning = entry.meanings[0].definitions[0].definition;
-
-            return {
-                ipa: ipa,
-                type: translateType(type),
-                meaning: meaning,
-                example: capitalizeFirstLetter(bestExample)
-            };
-
-        } catch (error) {
-            // Offline/Not Found fallback
-            return {
-                ipa: "/.../",
-                type: "...",
-                meaning: "...",
-                example: generateFallbackExample(word, 'noun')
-            };
-        }
-    }
-};
+// AI Logic Removed - Manual Input Only
 
 function generateFallbackExample(word, type) {
     if (type.includes('noun')) return `The ${word} is very important.`;
@@ -289,43 +208,15 @@ class App {
         }
     }
 
-    async handleWordInput(input, idx) {
+    // Manual input only - No auto-fill
+    handleWordInput(input, idx) {
+        // This function is called on blur, but we don't auto-fill anymore
+        // Users manually enter all vocabulary data
         const word = input.value.trim();
         if (!word) return;
 
-        // Auto add next row if this is the last row
-        // const tbody = document.getElementById('input-rows');
-        // if (tbody.children.length === idx + 1) {
-        //     this.addRow();
-        // }
-
-        // Add loading state
-        input.parentElement.classList.add('animate-pulse');
-
-        // AI prediction logic reuse existing AI object
-        // NOTE: The original code removed AI autofill in previous version of script.js?
-        // Ah, lines 247-248 say "AI AUTOFILL REMOVED - Manual input only".
-        // BUT the user prompt 68 says "Nhập từ tiếng Anh, hệ thống sẽ tự động điền".
-        // I should probably restore it if I want it to work like my app.js did. 
-        // My app.js had: `const prediction = await AI.predict(word);`
-        // Let's restore AI functionality as that seems to be the intent of "upgrading".
-
-        const prediction = await AI.predict(word);
-
-        const setAndResize = (id, value) => {
-            const el = document.getElementById(id);
-            if (el) {
-                el.value = value || '';
-                this.autoResize(el);
-            }
-        };
-
-        setAndResize(`ipa-${idx}`, prediction.ipa);
-        setAndResize(`type-${idx}`, prediction.type);
-        setAndResize(`meaning-${idx}`, prediction.meaning);
-        setAndResize(`example-${idx}`, prediction.example);
-
-        input.parentElement.classList.remove('animate-pulse');
+        // Just resize the input if needed
+        this.autoResize(input);
     }
 
     saveSession() {
