@@ -142,6 +142,10 @@ class App {
         } else if (viewId === 'stats') {
             this.renderStats();
         }
+
+        // Auto scroll to top of content
+        const main = document.querySelector('main');
+        if (main) main.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     // --- INPUT TABLE LOGIC ---
