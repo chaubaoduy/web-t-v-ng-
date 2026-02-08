@@ -71,11 +71,11 @@ function Learn({ onSaveSuccess }) {
     };
 
     return (
-        <div className="max-w-6xl mx-auto animate-pop">
+        <div className="w-full max-w-[98%] mx-auto animate-pop">
             <div className="flex justify-between items-center mb-6">
                 <div>
-                    <h2 className="text-2xl font-bold text-slate-700">Thêm từ vựng mới</h2>
-                    <p className="text-slate-500">Nhập danh sách từ cần học bên dưới</p>
+                    <h2 className="text-2xl font-bold text-slate-700 dark:text-white dark:drop-shadow-md">Thêm từ vựng mới</h2>
+                    <p className="text-slate-500 dark:text-slate-100 dark:drop-shadow-sm">Nhập danh sách từ cần học bên dưới</p>
                 </div>
                 <div className="flex gap-3">
                     <button
@@ -100,13 +100,13 @@ function Learn({ onSaveSuccess }) {
                     <table className="w-full text-left border-collapse">
                         <thead>
                             <tr className="bg-slate-50/50 border-b border-slate-100">
-                                <th className="p-4 text-xs font-bold text-slate-400 uppercase w-12">#</th>
-                                <th className="p-4 text-xs font-bold text-slate-400 uppercase w-48">Từ vựng *</th>
-                                <th className="p-4 text-xs font-bold text-slate-400 uppercase w-32">IPA</th>
-                                <th className="p-4 text-xs font-bold text-slate-400 uppercase w-32">Loại từ</th>
-                                <th className="p-4 text-xs font-bold text-slate-400 uppercase w-64">Nghĩa *</th>
-                                <th className="p-4 text-xs font-bold text-slate-400 uppercase">Ví dụ</th>
-                                <th className="p-4 text-xs font-bold text-slate-400 uppercase w-16"></th>
+                                <th className="p-4 text-sm font-bold text-slate-400 uppercase w-12 text-center"></th>
+                                <th className="p-4 text-sm font-extrabold uppercase w-48 tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-cyan-500 drop-shadow-sm">Từ vựng</th>
+                                <th className="p-4 text-sm font-extrabold uppercase w-32 tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-pink-500 drop-shadow-sm">IPA</th>
+                                <th className="p-4 text-sm font-extrabold uppercase w-32 tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-orange-500 drop-shadow-sm">Loại từ</th>
+                                <th className="p-4 text-sm font-extrabold uppercase w-64 tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-500 drop-shadow-sm">Nghĩa</th>
+                                <th className="p-4 text-sm font-extrabold uppercase tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-violet-500 drop-shadow-sm">Ví dụ</th>
+                                <th className="p-4 text-sm font-bold text-slate-400 uppercase w-16"></th>
                             </tr>
                         </thead>
                         <tbody ref={tableBodyRef} className="divide-y divide-slate-100">
@@ -116,8 +116,7 @@ function Learn({ onSaveSuccess }) {
                                     <td className="p-2">
                                         <input
                                             type="text"
-                                            className="w-full bg-slate-50 border-2 border-transparent focus:border-blue-400 focus:bg-white rounded-lg px-3 py-2 outline-none transition-all font-bold text-slate-700"
-                                            placeholder="Hello"
+                                            className="w-full bg-white border-2 border-blue-400 rounded-lg px-3 py-2 outline-none transition-all font-bold text-slate-700 placeholder-transparent"
                                             value={row.word}
                                             onChange={(e) => handleChange(row.id, 'word', e.target.value)}
                                             onKeyDown={(e) => handleKeyDown(e, index)}
@@ -126,8 +125,7 @@ function Learn({ onSaveSuccess }) {
                                     <td className="p-2">
                                         <input
                                             type="text"
-                                            className="w-full bg-slate-50 border-2 border-transparent focus:border-blue-400 focus:bg-white rounded-lg px-3 py-2 outline-none transition-all text-slate-500 font-mono text-sm"
-                                            placeholder="/həˈləʊ/"
+                                            className="w-full bg-white border-2 border-blue-400 rounded-lg px-3 py-2 outline-none transition-all text-slate-600 font-mono text-sm placeholder-transparent"
                                             value={row.ipa}
                                             onChange={(e) => handleChange(row.id, 'ipa', e.target.value)}
                                             onKeyDown={(e) => handleKeyDown(e, index)}
@@ -135,7 +133,7 @@ function Learn({ onSaveSuccess }) {
                                     </td>
                                     <td className="p-2">
                                         <select
-                                            className="w-full bg-slate-50 border-2 border-transparent focus:border-blue-400 focus:bg-white rounded-lg px-3 py-2 outline-none transition-all text-sm text-slate-600"
+                                            className="w-full bg-white border-2 border-blue-400 rounded-lg px-3 py-2 outline-none transition-all text-sm text-slate-600"
                                             value={row.type}
                                             onChange={(e) => handleChange(row.id, 'type', e.target.value)}
                                         >
@@ -151,8 +149,7 @@ function Learn({ onSaveSuccess }) {
                                     <td className="p-2">
                                         <input
                                             type="text"
-                                            className="w-full bg-slate-50 border-2 border-transparent focus:border-blue-400 focus:bg-white rounded-lg px-3 py-2 outline-none transition-all text-slate-700"
-                                            placeholder="Xin chào"
+                                            className="w-full bg-white border-2 border-blue-400 rounded-lg px-3 py-2 outline-none transition-all text-slate-700 placeholder-transparent"
                                             value={row.meaning}
                                             onChange={(e) => handleChange(row.id, 'meaning', e.target.value)}
                                             onKeyDown={(e) => handleKeyDown(e, index)}
@@ -161,8 +158,7 @@ function Learn({ onSaveSuccess }) {
                                     <td className="p-2">
                                         <input
                                             type="text"
-                                            className="w-full bg-slate-50 border-2 border-transparent focus:border-blue-400 focus:bg-white rounded-lg px-3 py-2 outline-none transition-all text-slate-500 italic"
-                                            placeholder="Hello world!"
+                                            className="w-full bg-white border-2 border-blue-400 rounded-lg px-3 py-2 outline-none transition-all text-slate-600 italic placeholder-transparent"
                                             value={row.example}
                                             onChange={(e) => handleChange(row.id, 'example', e.target.value)}
                                             onKeyDown={(e) => handleKeyDown(e, index)}
@@ -171,8 +167,9 @@ function Learn({ onSaveSuccess }) {
                                     <td className="p-2 text-center">
                                         <button
                                             onClick={() => deleteRow(row.id)}
-                                            className="w-8 h-8 rounded-full text-slate-300 hover:text-red-500 hover:bg-red-50 transition-all opacity-0 group-hover:opacity-100"
+                                            className="w-10 h-10 rounded-full text-black hover:bg-slate-100 hover:text-red-500 transition-all flex items-center justify-center text-lg active:scale-90"
                                             tabIndex="-1"
+                                            title="Xóa dòng"
                                         >
                                             <i className="fa-solid fa-trash"></i>
                                         </button>
@@ -185,8 +182,8 @@ function Learn({ onSaveSuccess }) {
 
                 {/* Empty State Hint if only 1 row */}
                 {rows.length === 1 && !rows[0].word && (
-                    <div className="p-8 text-center text-slate-400 text-sm">
-                        <i className="fa-regular fa-lightbulb mb-2 text-yellow-400 text-xl block"></i>
+                    <div className="p-8 text-center text-slate-600 text-sm font-medium">
+                        <i className="fa-regular fa-lightbulb mb-2 text-yellow-500 text-xl block"></i>
                         Nhập từ vựng, IPA, và nghĩa. Nhấn <b>Enter</b> để xuống dòng nhanh.
                     </div>
                 )}

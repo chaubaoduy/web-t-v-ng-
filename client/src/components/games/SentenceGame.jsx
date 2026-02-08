@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { api } from '../../services/api';
+import { playSound, fireConfetti } from '../../utils';
 
 function SentenceGame({ data, setId, onExit, onComplete }) {
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -42,8 +43,10 @@ function SentenceGame({ data, setId, onExit, onComplete }) {
         const correct = currentWord.word;
         if (word === correct) {
             setFeedback({ type: 'success', msg: 'Chính xác!' });
+            playSound('success');
         } else {
             setFeedback({ type: 'error', msg: `Sai rồi! Đáp án: ${correct}` });
+            playSound('error');
         }
 
         setTimeout(() => {
@@ -61,6 +64,7 @@ function SentenceGame({ data, setId, onExit, onComplete }) {
 
     const finishGame = async () => {
         setFinished(true);
+        fireConfetti();
         try {
             await api.saveResult({
                 id: Date.now(),

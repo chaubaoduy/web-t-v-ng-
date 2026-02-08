@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { api } from '../../services/api';
+import { playSound, fireConfetti } from '../../utils';
 
 function QuizGame({ data, setId, onExit, onComplete }) {
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -41,8 +42,10 @@ function QuizGame({ data, setId, onExit, onComplete }) {
         if (word.word === correctWord.word) {
             setScore(score + 10);
             setFeedback({ type: 'success', msg: 'Chính xác! 🎉' });
+            playSound('success');
         } else {
             setFeedback({ type: 'error', msg: 'Sai rồi! 😅' });
+            playSound('error');
         }
 
         setTimeout(() => {
@@ -56,6 +59,7 @@ function QuizGame({ data, setId, onExit, onComplete }) {
 
     const finishGame = async () => {
         setFinished(true);
+        fireConfetti();
         try {
             await api.saveResult({
                 id: Date.now(),

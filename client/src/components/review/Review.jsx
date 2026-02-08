@@ -41,7 +41,7 @@ function Review({ onPlayGame }) {
                 <div className="flex justify-between items-center mb-6">
                     <button
                         onClick={() => setSelectedSet(null)}
-                        className="text-slate-500 hover:text-indigo-600 font-medium flex items-center gap-2 transition-colors"
+                        className="text-slate-500 hover:text-indigo-600 font-medium flex items-center gap-2 transition-colors dark:text-white dark:hover:text-indigo-200 dark:drop-shadow-sm"
                     >
                         <i className="fa-solid fa-arrow-left"></i> Quay lại
                     </button>
@@ -110,8 +110,8 @@ function Review({ onPlayGame }) {
                     <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm text-slate-300 text-2xl">
                         <i className="fa-solid fa-folder-open"></i>
                     </div>
-                    <h3 className="text-lg font-bold text-slate-600">Chưa có bộ từ vựng nào</h3>
-                    <p className="text-slate-400 mt-1">Hãy chuyển sang mục "Học từ" để tạo bộ mới nhé!</p>
+                    <h3 className="text-lg font-bold text-slate-700">Chưa có bộ từ vựng nào</h3>
+                    <p className="text-slate-500 mt-1">Hãy chuyển sang mục "Học từ" để tạo bộ mới nhé!</p>
                 </div>
             ) : (
                 sets.map(set => (
@@ -140,7 +140,7 @@ function Review({ onPlayGame }) {
                                 </span>
                             </div>
                             <h3 className="font-bold text-xl text-slate-800 mb-1">Bộ từ vựng</h3>
-                            <p className="text-slate-400 text-sm font-medium">{set.timestamp}</p>
+                            <p className="text-slate-500 text-sm font-medium">{set.timestamp}</p>
                         </div>
 
                         <div className="bg-slate-50/80 p-3 border-t border-slate-100 flex gap-2 backdrop-blur-sm">

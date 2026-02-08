@@ -48,8 +48,8 @@ function Stats({ onNavigate }) {
                         <i className="fa-solid fa-book-open"></i>
                     </div>
                     <div>
-                        <p className="text-sm text-slate-400 font-medium">Tổng từ vựng</p>
-                        <h3 className="text-3xl font-bold text-slate-700">{stats.totalWords}</h3>
+                        <p className="text-sm text-slate-600 font-medium">Tổng từ vựng</p>
+                        <h3 className="text-3xl font-bold text-slate-900">{stats.totalWords}</h3>
                     </div>
                 </div>
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4">
@@ -57,8 +57,8 @@ function Stats({ onNavigate }) {
                         <i className="fa-solid fa-layer-group"></i>
                     </div>
                     <div>
-                        <p className="text-sm text-slate-400 font-medium">Bộ từ vựng</p>
-                        <h3 className="text-3xl font-bold text-slate-700">{stats.totalSets}</h3>
+                        <p className="text-sm text-slate-600 font-medium">Bộ từ vựng</p>
+                        <h3 className="text-3xl font-bold text-slate-900">{stats.totalSets}</h3>
                     </div>
                 </div>
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4">
@@ -66,8 +66,8 @@ function Stats({ onNavigate }) {
                         <i className="fa-solid fa-gamepad"></i>
                     </div>
                     <div>
-                        <p className="text-sm text-slate-400 font-medium">Đã ôn tập</p>
-                        <h3 className="text-3xl font-bold text-slate-700">{stats.totalGames}</h3>
+                        <p className="text-sm text-slate-600 font-medium">Đã ôn tập</p>
+                        <h3 className="text-3xl font-bold text-slate-900">{stats.totalGames}</h3>
                     </div>
                 </div>
             </div>
@@ -75,16 +75,16 @@ function Stats({ onNavigate }) {
             {/* History Table */}
             <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
                 <div className="p-6 border-b border-slate-100">
-                    <h3 className="font-bold text-slate-700 text-lg">Hoạt động gần đây</h3>
+                    <h3 className="font-bold text-slate-900 text-lg">Hoạt động gần đây</h3>
                 </div>
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
                             <tr>
-                                <th className="p-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Trò chơi</th>
-                                <th className="p-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Bộ từ</th>
-                                <th className="p-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Kết quả</th>
-                                <th className="p-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Thời gian</th>
+                                <th className="p-4 text-xs font-bold text-slate-600 uppercase tracking-wider">Trò chơi</th>
+                                <th className="p-4 text-xs font-bold text-slate-600 uppercase tracking-wider">Bộ từ</th>
+                                <th className="p-4 text-xs font-bold text-slate-600 uppercase tracking-wider">Kết quả</th>
+                                <th className="p-4 text-xs font-bold text-slate-600 uppercase tracking-wider">Thời gian</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
@@ -97,12 +97,12 @@ function Stats({ onNavigate }) {
                                     const meta = getGameMeta(row.type);
                                     return (
                                         <tr key={idx} className="hover:bg-slate-50 transition-colors">
-                                            <td className="p-4 font-medium text-slate-700">
+                                            <td className="p-4 font-medium text-slate-900">
                                                 <i className={`fa-solid ${meta.icon} ${meta.color} mr-2`}></i> {meta.label}
                                             </td>
-                                            <td className="p-4 text-slate-500 text-sm">{row.setName}</td>
-                                            <td className="p-4 font-bold text-slate-700">{row.result}</td>
-                                            <td className="p-4 text-slate-400 text-sm">{row.dateFormatted || row.timestamp}</td>
+                                            <td className="p-4 text-slate-700 text-sm">{row.setName}</td>
+                                            <td className="p-4 font-bold text-slate-900">{row.result}</td>
+                                            <td className="p-4 text-slate-600 text-sm">{row.dateFormatted || row.timestamp}</td>
                                         </tr>
                                     );
                                 })

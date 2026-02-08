@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { api } from '../../services/api';
+import { playSound, fireConfetti } from '../../utils';
 
 function ScrambleGame({ data, setId, onExit, onComplete }) {
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -52,6 +53,7 @@ function ScrambleGame({ data, setId, onExit, onComplete }) {
         const formed = inputs.map(x => x.char).join('');
         if (formed === cleanWord) {
             setFeedback({ type: 'success', msg: 'Chính xác! 🎉' });
+            playSound('success');
             setTimeout(() => {
                 if (currentIndex < data.length - 1) {
                     setCurrentIndex(currentIndex + 1);
@@ -61,11 +63,13 @@ function ScrambleGame({ data, setId, onExit, onComplete }) {
             }, 1000);
         } else {
             setFeedback({ type: 'error', msg: 'Chưa đúng, thử lại nhé!' });
+            playSound('error');
         }
     };
 
     const finishGame = async () => {
         setFinished(true);
+        fireConfetti();
         try {
             await api.saveResult({
                 id: Date.now(),

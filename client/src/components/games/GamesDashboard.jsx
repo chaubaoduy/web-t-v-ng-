@@ -87,11 +87,11 @@ function GamesDashboard({ initialGame, initialSetId }) {
         return (
             <div className="max-w-4xl mx-auto animate-pop">
                 <div className="mb-6 flex items-center gap-4">
-                    <button onClick={handleBack} className="text-slate-400 hover:text-slate-600">
+                    <button onClick={handleBack} className="text-slate-400 hover:text-slate-600 dark:text-white dark:hover:text-indigo-200 dark:drop-shadow-sm transition-colors">
                         <i className="fa-solid fa-arrow-left text-xl"></i>
                     </button>
                     <div>
-                        <h2 className="text-2xl font-bold text-slate-700">Chọn bộ từ để ôn tập</h2>
+                        <h2 className="text-2xl font-bold text-slate-700 dark:text-white dark:drop-shadow-md">Chọn bộ từ để ôn tập</h2>
                         <p className={`text-sm font-bold ${meta.color} uppercase`}>{meta.label}</p>
                     </div>
                 </div>
@@ -105,7 +105,7 @@ function GamesDashboard({ initialGame, initialSetId }) {
                         >
                             <div>
                                 <h4 className="font-bold text-slate-700 text-lg">Bộ từ {set.timestamp}</h4>
-                                <p className="text-sm text-slate-400 group-hover:text-indigo-500 transition-colors">
+                                <p className="text-sm text-slate-500 group-hover:text-indigo-600 transition-colors">
                                     <i className="fa-solid fa-layer-group mr-1"></i> {set.wordCount} từ
                                 </p>
                             </div>

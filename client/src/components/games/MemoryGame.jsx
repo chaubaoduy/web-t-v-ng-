@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { api } from '../../services/api';
+import { playSound, fireConfetti } from '../../utils';
 
 function MemoryGame({ data, setId, onExit, onComplete }) {
     const [cards, setCards] = useState([]);
@@ -29,7 +30,9 @@ function MemoryGame({ data, setId, onExit, onComplete }) {
             const card1 = cards[newFlipped[0]];
             const card2 = cards[newFlipped[1]];
 
+
             if (card1.id === card2.id) {
+                playSound('success');
                 // Match
                 setTimeout(() => {
                     const newMatched = [...matched, ...newFlipped];
@@ -41,6 +44,7 @@ function MemoryGame({ data, setId, onExit, onComplete }) {
                     }
                 }, 500);
             } else {
+                playSound('error');
                 // No Match
                 setTimeout(() => {
                     setFlipped([]);
@@ -51,6 +55,7 @@ function MemoryGame({ data, setId, onExit, onComplete }) {
 
     const finishGame = async () => {
         setFinished(true);
+        fireConfetti();
         try {
             await api.saveResult({
                 id: Date.now(),
